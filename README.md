@@ -1,4 +1,4 @@
-# mockifyr-web
+# mockifyr.omercelik.dev
 
 Marketing + docs site for [Mockifyr](https://github.com/omercelikdev/mockifyr) —
 built with **Astro + Starlight**, themed with Mockifyr's design tokens. Deploys to
