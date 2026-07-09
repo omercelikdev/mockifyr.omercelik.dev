@@ -1,0 +1,56 @@
+---
+title: Mockifyr
+description: An independent, .NET-based API mock engine + platform — a functional WireMock alternative, in one image.
+template: splash
+hero:
+  tagline: A transport-agnostic API mock engine + dashboard. Import your WireMock stubs, run one command, done. Correctness proven differentially against real WireMock.
+  image:
+    file: ../../assets/logo.svg
+  actions:
+    - text: Get started
+      link: /getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/omercelikdev/mockifyr
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Run it in one line
+
+The same command on macOS, Linux, and Windows — no volume, no flags:
+
+```bash
+docker run -p 8080:8080 ghcr.io/omercelikdev/mockifyr
+```
+
+- **Mock surface** — `http://localhost:8080`
+- **Admin API** — `http://localhost:8080/__admin`
+- **Dashboard** — `http://localhost:8080/__mockifyr`
+
+<CardGrid>
+  <Card title="WireMock-compatible" icon="approve-check">
+    Imports the WireMock JSON stub format — matching, templating, faults, scenarios,
+    proxy, and record & playback. Bring your existing stubs.
+  </Card>
+  <Card title="A real dashboard" icon="laptop">
+    A grouped stub tree, tabbed editor, request journal with detail, and an in-app
+    templating-helper reference.
+  </Card>
+  <Card title="Differentially verified" icon="random">
+    Correctness is proven byte-for-byte against Java WireMock in CI — not self-assessed.
+  </Card>
+  <Card title="Multi-protocol" icon="puzzle">
+    HTTP, gRPC, GraphQL, and WebSocket serving, with first-class multi-tenancy.
+  </Card>
+  <Card title="Pluggable persistence" icon="setting">
+    In-memory by default; opt into file, LiteDB, PostgreSQL, or Redis — with a change
+    feed to keep instances coherent.
+  </Card>
+  <Card title="One small image" icon="rocket">
+    Engine + admin API + dashboard in a single ~90 MB image, `linux/amd64` + `arm64`.
+  </Card>
+</CardGrid>

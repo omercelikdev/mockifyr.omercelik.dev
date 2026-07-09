@@ -1,0 +1,49 @@
+/* Mockifyr theme for Starlight — reuses the dashboard's tokens (docs/design-system.md).
+   Neutral grounds come from Mockifyr's grey stack; the docs accent is --violet (the same lively
+   motif the dashboard uses in empty states), so links/active nav read clearly on both themes. */
+
+:root {
+  --sl-font: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial, sans-serif;
+  --sl-font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+  --sl-nav-height: 3.75rem;
+}
+
+/* Dark (Starlight's default :root) — Mockifyr dark palette */
+:root {
+  --sl-color-accent-low: #17102b;
+  --sl-color-accent: #7c3aed;
+  --sl-color-accent-high: #c4b5fd;
+  --sl-color-white: #f4f4f5;
+  --sl-color-gray-1: #e4e4e7;
+  --sl-color-gray-2: #a1a1aa;
+  --sl-color-gray-3: #71717a;
+  --sl-color-gray-4: #3f3f46;
+  --sl-color-gray-5: #26262b;
+  --sl-color-gray-6: #17171c;
+  --sl-color-black: #0a0a0c;
+}
+
+/* Light — Mockifyr light palette */
+:root[data-theme='light'] {
+  --sl-color-accent-low: #ede9fe;
+  --sl-color-accent: #6d28d9;
+  --sl-color-accent-high: #4c1d95;
+  --sl-color-white: #18181b;
+  --sl-color-gray-1: #27272a;
+  --sl-color-gray-2: #3f3f46;
+  --sl-color-gray-3: #71717a;
+  --sl-color-gray-4: #a1a1aa;
+  --sl-color-gray-5: #e6e6e9;
+  --sl-color-gray-6: #f5f5f7;
+  --sl-color-gray-7: #ffffff;
+  --sl-color-black: #ffffff;
+}
+
+/* Rounded, token-consistent chrome */
+.sl-markdown-content :not(pre) > code { border-radius: 6px; }
+.sl-markdown-content pre { border-radius: 12px; }
+.card { border-radius: 16px; }
+site-search button { border-radius: 10px; }
+
+/* Splash hero: a subtle violet glow behind the title, on-brand and calm */
+.hero > img, .hero > .hero-html { filter: drop-shadow(0 8px 30px color-mix(in srgb, var(--sl-color-accent) 22%, transparent)); }
