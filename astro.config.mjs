@@ -23,6 +23,17 @@ export default defineConfig({
       // favicon far past a normal asset, and the file keeps its conventional path, so the query is
       // the only thing that tells them to refetch. Bump it if the icon changes again.
       favicon: '/favicon.svg?v=2',
+      // Starlight emits og:title, og:description and twitter:card, but no image — which left every
+      // shared link rendering as a card with an empty thumbnail, and `summary_large_image` promising
+      // one that never arrived. Absolute URLs are required here: a scraper resolves these without a
+      // document base.
+      head: [
+        { tag: 'meta', attrs: { property: 'og:image', content: 'https://mockifyr.omercelik.dev/og.png' } },
+        { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
+        { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Mockifyr — an independent .NET API mock engine and platform' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://mockifyr.omercelik.dev/og.png' } },
+      ],
       customCss: ['./src/styles/mockifyr.css'],
       // Reproduce the dashboard's near-black accent for chrome; docs use --violet as the lively accent.
       sidebar: [
