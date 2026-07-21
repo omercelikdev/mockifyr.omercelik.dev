@@ -19,6 +19,10 @@ export default defineConfig({
       social: {
         github: 'https://github.com/omercelikdev/mockifyr',
       },
+      // Versioned so the mark replaces the old placeholder tile on the next visit. Browsers cache a
+      // favicon far past a normal asset, and the file keeps its conventional path, so the query is
+      // the only thing that tells them to refetch. Bump it if the icon changes again.
+      favicon: '/favicon.svg?v=2',
       customCss: ['./src/styles/mockifyr.css'],
       // Reproduce the dashboard's near-black accent for chrome; docs use --violet as the lively accent.
       sidebar: [
