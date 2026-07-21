@@ -67,6 +67,26 @@ a.action.primary {
 }
 .hero .action.primary:hover { opacity: 0.9; }
 
-/* The one violet motif: a soft glow behind the hero logo (design-system uses --violet as a motif) */
+/* Header logo. The mark is roughly 2:1, so Starlight's default height makes it twice as wide as a
+   square logo and it overpowers the wordmark next to it. Sized against the wordmark's cap height
+   rather than the nav bar. */
+.site-title img { height: 1.4rem; width: auto; }
+
+/* Hero mark. No glow: a coloured halo behind a two-colour mark reads as a third colour, and the mark
+   already carries the only accent in the brand. It sits in a transparent double-bordered frame
+   instead — the outer hairline is the page border token, the inner one is drawn with an inset shadow
+   so the pair stays crisp at any zoom without a wrapper element. */
 .hero > img,
-.hero > .hero-html { filter: drop-shadow(0 8px 34px color-mix(in srgb, #7c3aed 26%, transparent)); }
+.hero > .hero-html {
+  box-sizing: border-box;
+  padding: clamp(2rem, 5.5vw, 3.5rem);
+  border: 1px solid color-mix(in srgb, var(--sl-color-gray-3) 42%, transparent);
+  border-radius: var(--mk-radius-2xl);
+  /* The second line is an inset ring rather than a wrapper element: a 4px band of page ground, then
+     a lighter hairline. Both are mixed against --sl-color-gray-3, which is defined in each palette,
+     so the pair keeps the same weight in light and dark instead of vanishing into one of them. */
+  box-shadow:
+    inset 0 0 0 4px var(--sl-color-bg),
+    inset 0 0 0 5px color-mix(in srgb, var(--sl-color-gray-3) 26%, transparent);
+  background: transparent;
+}

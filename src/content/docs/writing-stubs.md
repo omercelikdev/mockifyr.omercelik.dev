@@ -23,25 +23,54 @@ existing stubs work unchanged.
 }
 ```
 
+Create one over the admin API, or in the dashboard's stub editor:
+
+```bash
+curl -X POST http://localhost:8080/__admin/mappings --data-binary @stub.json
+```
+
 ## Request matching
 
 | Field | Matches on |
 |-------|-----------|
-| `method` | HTTP method (or `ANY`) |
-| `url` · `urlPath` · `urlPattern` · `urlPathPattern` | exact URL, path, or regex |
-| `headers` · `queryParameters` · `cookies` | per-key matchers |
-| `bodyPatterns` | `equalTo`, `equalToJson`, `matchesJsonPath`, `equalToXml`, `matchesXPath`, `matches` (regex), `contains`, `matchesJsonSchema`, … |
+| `method` | HTTP method, or `ANY` |
+| `url` · `urlPath` · `urlPattern` · `urlPathPattern` · `urlPathTemplate` | exact URL, path, regex, or a templated path with named variables |
+| `headers` · `queryParameters` · `cookies` · `formParameters` | per-key value matchers |
+| `bodyPatterns` | `equalTo`, `equalToJson`, `matchesJsonPath`, `equalToXml`, `matchesXPath`, `matches`, `contains`, `matchesJsonSchema`, and more |
+| `scheme` · `host` · `port` | multi-domain routing |
 
-Matchers compose with `and` / `or`, and stubs carry a `priority` (lower wins; ties broken by recency).
+Matchers compose with `and`, `or` and `not`. The full set, including the gotchas worth knowing before
+you hit them, is in [request matching](/request-matching/).
+
+Stubs carry a `priority`, defaulting to `5`, where the **lowest number wins**.
+
+:::caution
+Equal-priority ties are **not** resolved deterministically — the winner depends on how the stubs were
+loaded. Give competing stubs distinct priorities when the order matters.
+:::
 
 ## Response
 
-- `status`, `statusMessage`, `headers` (single- or multi-value)
-- Body: `body` (string), `jsonBody` (object), or `base64Body`
+- `status`, `statusMessage`, `headers` — single- or multi-value
+- Body: `body` (string), `jsonBody` (object) or `base64Body`
 - `transformers: ["response-template"]` enables [templating](/templating/)
-- Behaviour: `fixedDelayMilliseconds`, `delayDistribution`, `fault`, `proxyBaseUrl`
+- Behaviour: [delays and faults](/delays-and-faults/), [proxying](/proxying/)
+
+The full field list is in [responses](/responses/).
+
+## Stateful stubs
+
+`scenarioName`, `requiredScenarioState` and `newScenarioState` make a stub respond differently
+depending on what came before — see [scenarios](/scenarios/).
 
 ## Tenants
 
-Every stub belongs to a tenant. The dashboard's tenant switcher (and the `X-Mockifyr-Tenant` header on
-the admin API) scopes everything — a tenant can never see another's stubs.
+Every stub belongs to a tenant. The dashboard's tenant switcher, and the `X-Mockifyr-Tenant` header on
+the admin API, scope everything — a tenant can never see another's stubs. See
+[multi-tenancy](/multi-tenancy/).
+
+## Related
+
+- [Request matching](/request-matching/) — every matcher
+- [Responses](/responses/) — every response field
+- [Migrating from WireMock](/migrating-from-wiremock/) — bring your existing stubs

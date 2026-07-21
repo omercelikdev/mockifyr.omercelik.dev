@@ -14,8 +14,13 @@ Only the admin API and dashboard are protected.
 
 ## Enable it
 
-Two settings, always given together — `admin-user` and `admin-pass`. Provide them as environment
-variables (recommended) or command-line flags. If only one is set, auth stays off.
+Two settings, always given together — `admin-user` and `admin-pass`. If only one is set, auth stays
+off.
+
+Either form works, because **every Mockifyr flag is also readable as an environment variable of the
+same name** — the host builds its configuration with the standard .NET builder, so `--admin-user` on
+the command line and `admin-user` in the environment reach the same key. Command-line arguments win
+when both are present. Prefer the environment for credentials; see the [CLI reference](/cli/).
 
 ### Docker — environment variables (recommended)
 
