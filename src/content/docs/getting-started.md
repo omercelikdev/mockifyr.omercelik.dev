@@ -68,6 +68,9 @@ docker compose -f docker-compose.postgres.yml up    # PostgreSQL
 docker compose -f docker-compose.redis.yml up       # Redis
 ```
 
+Both add a `--change-feed` so several instances stay coherent. See [persistence](/persistence/) for
+every provider, and for Git sync.
+
 ## Run without Docker
 
 Requires the .NET 10 SDK:
@@ -76,8 +79,16 @@ Requires the .NET 10 SDK:
 dotnet run --project src/Mockifyr.Server -- --port 8080 --root-dir .
 ```
 
+## Configuring it
+
+There is no configuration file — every setting is a command-line flag, and **every flag is also
+readable as an environment variable of the same name**, which is why `-e admin-user=alice` works on
+`docker run`. The full list is in the [CLI reference](/cli/).
+
 ## Next steps
 
-- [Secure the admin API](/securing-the-admin-api/) with a username + password.
-- [Write stubs](/writing-stubs/) — matching and responses.
-- [Migrate from WireMock](/migrating-from-wiremock/).
+- [Take the dashboard tour](/the-dashboard/) — what each page does.
+- [Write stubs](/writing-stubs/) — [matching](/request-matching/) and [responses](/responses/).
+- [Secure the admin API](/securing-the-admin-api/) with a username and password.
+- [Migrate from WireMock](/migrating-from-wiremock/), then skim
+  [known limitations](/limitations/) — it is the page most likely to save you an afternoon.

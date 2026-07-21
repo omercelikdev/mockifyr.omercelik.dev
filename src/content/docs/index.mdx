@@ -5,7 +5,8 @@ template: splash
 hero:
   tagline: A transport-agnostic API mock engine + dashboard. Import your WireMock stubs, run one command, done. Correctness proven differentially against real WireMock.
   image:
-    file: ../../assets/logo.svg
+    light: ../../assets/logo-light.svg
+    dark: ../../assets/logo-dark.svg
   actions:
     - text: Get started
       link: /getting-started/
@@ -33,24 +34,38 @@ docker run -p 8080:8080 ghcr.io/omercelikdev/mockifyr
 
 <CardGrid>
   <Card title="WireMock-compatible" icon="approve-check">
-    Imports the WireMock JSON stub format — matching, templating, faults, scenarios,
-    proxy, and record & playback. Bring your existing stubs.
+    Imports the WireMock JSON stub format — [matching](/request-matching/),
+    [templating](/templating/), [faults](/delays-and-faults/), [scenarios](/scenarios/),
+    [proxying](/proxying/) and [record & playback](/record-and-playback/).
   </Card>
   <Card title="A real dashboard" icon="laptop">
-    A grouped stub tree, tabbed editor, request journal with detail, and an in-app
-    templating-helper reference.
+    A grouped stub tree, tabbed editor, request journal with callback detail, scenarios,
+    recordings and settings — in six languages. [Take the tour](/the-dashboard/).
   </Card>
   <Card title="Differentially verified" icon="random">
-    Correctness is proven byte-for-byte against Java WireMock in CI — not self-assessed.
+    Correctness is proven against Java WireMock in CI, not self-assessed. Everything that
+    testing left out is written down in [known limitations](/limitations/).
   </Card>
   <Card title="Multi-protocol" icon="puzzle">
-    HTTP, gRPC, GraphQL, and WebSocket serving, with first-class multi-tenancy.
+    HTTP, [gRPC](/grpc/), [GraphQL](/graphql/) and [WebSocket](/websocket/) serving, with
+    first-class [multi-tenancy](/multi-tenancy/).
   </Card>
   <Card title="Pluggable persistence" icon="setting">
-    In-memory by default; opt into file, LiteDB, PostgreSQL, or Redis — with a change
-    feed to keep instances coherent.
+    In-memory by default; opt into file, LiteDB, PostgreSQL or Redis, with a change feed to
+    keep instances coherent — and optional Git sync. [How it works](/persistence/).
   </Card>
   <Card title="One small image" icon="rocket">
-    Engine + admin API + dashboard in a single ~90 MB image, `linux/amd64` + `arm64`.
+    Engine + admin API + dashboard in a single image, `linux/amd64` and `arm64`. Every
+    setting is a flag, and [every flag is an environment variable](/cli/).
   </Card>
 </CardGrid>
+
+## Honest about the gaps
+
+Mockifyr is verified by running the same scenario through both engines and diffing the result — the
+reference is a real WireMock instance, not a claim. Where a behaviour is deliberately not reproduced,
+it is recorded rather than glossed over: the delay distributions that are parsed, the matchers that
+belong to WireMock Cloud, the helpers that do not exist despite appearing in some references.
+
+Read [known limitations](/limitations/) before you migrate. It is the page most likely to save you an
+afternoon.
