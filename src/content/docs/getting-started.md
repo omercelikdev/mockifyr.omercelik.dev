@@ -45,9 +45,14 @@ The zero-arg run is in-memory. To persist across restarts, use Compose or a **na
 identical on every OS:
 
 ```bash
-docker compose up                                         # stubs live in ./mappings, next to you
-docker run -p 8080:8080 -v mockifyr-data:/work/mappings ghcr.io/omercelikdev/mockifyr   # named volume
+docker compose up                                # stubs live in ./mappings, next to you
+docker run -p 8080:8080 -v mockifyr-data:/work ghcr.io/omercelikdev/mockifyr   # named volume
 ```
+
+Mount **`/work`**, not just `/work/mappings` — the file store also keeps
+[environment configuration](/environments/), response body files and gRPC descriptors under `/work`,
+and a mappings-only mount silently loses those when the container is recreated. See
+[Persistence → Docker](/persistence/#docker) for the full layout and a .NET Aspire example.
 
 ### Preload stub files from your host
 
