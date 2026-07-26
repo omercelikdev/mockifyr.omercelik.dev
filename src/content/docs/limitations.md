@@ -145,3 +145,13 @@ See [extending Mockifyr](/extending/).
 If Mockifyr behaves differently from WireMock in a way that is **not** on this list, that is a bug worth
 reporting at <https://github.com/omercelikdev/mockifyr/issues>. Per-feature parity notes — including the
 behaviours the differential harness discovered — live in the repository's `docs/parity/` directory.
+
+## Message channels (email & SMS)
+
+- The message inbox is **in-memory only** — messages do not survive a restart (stubs do, via the
+  persistence providers).
+- **No inbound simulation**: Mockifyr never initiates a message toward your application (no
+  incoming-SMS webhooks, no Twilio status callbacks yet).
+- SMTP fault directives are tenant-wide, not rule-based; STARTTLS is not implemented.
+- `twilio` is the only SMS provider profile so far; other providers can still be mocked with
+  ordinary stubs.

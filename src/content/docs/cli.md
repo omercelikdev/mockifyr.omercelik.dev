@@ -42,6 +42,14 @@ See [HTTPS, HTTP/2 and mTLS](/https-and-mtls/).
 | `--root-dir <dir>` | unset | Loads `<dir>/mappings/*.json` at startup, persists stub mutations there, and provides `<dir>/__files`, `<dir>/grpc/*.dsc`, `<dir>/environments/` and `<dir>/outbound-trust.json`. |
 | `--dashboard <dir>` | unset | Serves the built dashboard under `/__mockifyr`, only if the directory exists. |
 
+### Message channels
+
+| Flag | Default | Effect |
+|------|---------|--------|
+| `--smtp-port <n>` | unset | Starts the ESMTP capture listener: real mail in, realistic replies out, everything captured into the tenant inbox. The AUTH username selects the tenant. See [Email & SMS mocking](/messages/). |
+| `--sms-profile twilio` | unset | Mounts Twilio's send-message endpoint on the mock surface — the official SDK works unchanged; every send is captured. A stub on the same URL still wins. |
+| `--message-limit <n>` | `1000` | Per-tenant inbox bound; the oldest message is evicted first. |
+
 ### Admin authentication
 
 | Flag | Default | Effect |

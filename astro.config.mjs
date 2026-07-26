@@ -75,6 +75,12 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Messages',
+          items: [
+            { label: 'Email & SMS mocking', slug: 'messages' },
+          ],
+        },
+        {
           label: 'Protocols',
           items: [
             { label: 'gRPC', slug: 'grpc' },
