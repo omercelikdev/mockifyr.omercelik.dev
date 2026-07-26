@@ -187,6 +187,31 @@ curl -X POST http://localhost:8080/__admin/recordings/start \
 A missing `targetBaseUrl` is **422**. Recording is host-level, not per tenant — see
 [record and playback](/record-and-playback/).
 
+## Messages
+
+The tenant-scoped inbox of captured mail and SMS ([Email & SMS mocking](/messages/)). All routes
+honour `X-Mockifyr-Tenant`.
+
+| Route | Effect |
+|-------|--------|
+| `GET /__admin/messages` | List, newest first. Filters: `channel=email\|sms`, `recipient` (case-insensitive substring over any addressee), `contains` (subject + bodies), `matches` (regex, 250 ms budget — malformed patterns filter to nothing), `limit` (0 = unlimited). |
+| `GET /__admin/messages/count` | Count under the same filters — always agrees with the list. |
+| `GET /__admin/messages/{id}` | One message, including `raw` — the wire payload byte-for-byte (full MIME for mail, the provider form body for SMS). |
+| `GET /__admin/messages/{id}/attachments/{index}` | Attachment bytes with the stored content type and file name. |
+| `GET /__admin/messages/otp?recipient=…&channel=…&pattern=…` | Extracts a one-time code from the **newest** matching message. Default pattern `\b\d{4,8}\b`; a participating capture group wins over the full match. Errors are honest: `Message.NotFound`, `Otp.NoMatch`, or `422` for an invalid pattern. |
+| `GET /__admin/messages/{id}/otp?pattern=…` | The same extraction against one specific message. |
+| `DELETE /__admin/messages/{id}` | Delete one message (`404` when it is not in this tenant's inbox). |
+| `POST /__admin/messages/reset` | Clear the tenant's inbox. |
+| `GET/PUT/DELETE /__admin/messages/behaviors` | Per-tenant channel directives: `{"smtpFault":"none\|reject\|drop","smtpDelayMs":0,"smsErrorCode":21211,"webhookUrl":"…"}`. `PUT` validates (negative delay or a non-five-digit code → `422`); `DELETE` resets to defaults. |
+
+### gRPC descriptors
+
+| Route | Effect |
+|-------|--------|
+| `GET /__admin/grpc/descriptors` | The loaded `*.dsc` files and every indexed service/method. |
+| `POST /__admin/grpc/descriptors?name=…` | Uploads a compiled descriptor set (raw bytes). Parse-validated before anything is written; serving hot-reloads — no restart. |
+| `DELETE /__admin/grpc/descriptors/{name}` | Removes the file and rebuilds the index. |
+
 ## Outbound trust
 
 | Method | Path | Purpose | Response |
@@ -259,8 +284,9 @@ prefix is **404**. See [extending Mockifyr](/extending/).
 
 ## WebSocket endpoints
 
-`POST /__admin/message-mappings` and `POST /__admin/channels/send` belong to the WebSocket facade and
-are documented with it — see [WebSocket](/websocket/).
+`POST /__admin/message-mappings` (register), `GET /__admin/message-mappings` (list, each entry the
+registration JSON with its id stamped in), `DELETE /__admin/message-mappings/{id}`, and
+`POST /__admin/channels/send` belong to the WebSocket facade — see [WebSocket](/websocket/).
 
 ## Related
 
