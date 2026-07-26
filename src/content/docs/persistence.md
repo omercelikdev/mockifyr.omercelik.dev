@@ -18,7 +18,7 @@ whether you run in-memory or against PostgreSQL.
 | Redis | `--redis <connstr>` | Hash `mockifyr:stubs:{tenant}` keyed by stub id |
 
 ```bash
-docker run -p 8080:8080 -v "$PWD/mappings:/work/mappings" ghcr.io/omercelikdev/mockifyr
+docker run -p 8080:8080 -v mockifyr-data:/work ghcr.io/omercelikdev/mockifyr
 docker compose -f docker-compose.postgres.yml up
 docker compose -f docker-compose.redis.yml up
 ```
@@ -71,24 +71,45 @@ admin mutation persists — there is no way to create a stub that is deliberatel
 
 ## Docker
 
-The image bakes `--root-dir /work`, so stubs load from and persist to `/work/mappings`. Mount something
-there and they survive:
+The image bakes `--root-dir /work`, so everything in the table above lives under `/work` — stubs in
+`/work/mappings`, environments in `/work/environments`, and so on. Mount a volume at **`/work`** and
+all of it survives restarts *and* container recreation:
 
 ```bash
-# bind mount — stubs live in ./mappings on your host
-docker run -p 8080:8080 -v "$PWD/mappings:/work/mappings" ghcr.io/omercelikdev/mockifyr
+# named volume — stubs, environments, __files and grpc descriptors all survive
+docker run -p 8080:8080 -v mockifyr-data:/work ghcr.io/omercelikdev/mockifyr
 
-# named volume — Docker manages the storage
-docker run -p 8080:8080 -v mockifyr-data:/work/mappings ghcr.io/omercelikdev/mockifyr
+# plus a bind overlay for the stubs you edit by hand — they live in ./mappings on your host
+docker run -p 8080:8080 -v mockifyr-data:/work -v "$PWD/mappings:/work/mappings" ghcr.io/omercelikdev/mockifyr
 ```
+
+:::caution
+Mounting **only** `/work/mappings` keeps your stubs but silently loses the environment
+configuration — and `__files/`, `grpc/` — every time the container is recreated.
+:::
 
 The repository ships three Compose files:
 
 | File | What it sets up |
 |------|-----------------|
-| `docker-compose.yml` | Bind mount |
+| `docker-compose.yml` | Named volume at `/work` + `./mappings` bind overlay |
 | `docker-compose.postgres.yml` | PostgreSQL service, `--change-feed`, healthchecks, named volume |
 | `docker-compose.redis.yml` | Redis service, `--change-feed`, healthchecks, named volume |
+
+### .NET Aspire
+
+Aspire **recreates containers on every app-host run**, so a file-backed Mockifyr without a volume
+resets each run — imported stubs and environment configuration included. Mount a named volume at
+`/work` (and optionally keep the container alive between runs):
+
+```csharp
+var mockifyr = builder.AddContainer("mockifyr", "ghcr.io/omercelikdev/mockifyr")
+    .WithHttpEndpoint(port: 8080, targetPort: 8080)
+    .WithVolume("mockifyr-data", "/work")            // survives restarts and recreation
+    .WithLifetime(ContainerLifetime.Persistent);     // optional: reuse the container across runs
+```
+
+Or hand persistence to a durable datastore instead: `.WithArgs("--postgres", connectionString)`.
 
 ## Git sync
 
