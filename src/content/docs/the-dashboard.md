@@ -29,7 +29,9 @@ only the browser can reach.
 ### Dashboard (`/`)
 
 KPI cards, recent journal entries, top unmatched paths, stub distribution by method, and
-health/persistence.
+health/persistence. A **"Spin up a sandbox"** strip walks the four-step path from an API spec to a
+shareable mock — import a spec, seed data, issue a key, copy the base URL — each step linking to
+the screen that does it.
 
 :::note
 When no host answers, the dashboard falls back to **sample data** and shows a "sample" badge. The UI is
@@ -78,6 +80,24 @@ current tenant — per stub with **Add to stubs**, or all at once with **Import 
 
 Tenant-scoped keys, each holding several named values, with a switch for which value is active. See
 [environments](/environments/).
+
+### Resources (`/resources`)
+
+The data plane of the [integration sandbox](/admin-api/#sandbox-resources): tenant-scoped JSON
+collections on a rail, a paged document table beside it. Documents open in a JSON editor
+(create/replace — the version advances on every save); collections can be **seeded** from a pasted
+JSON array (transactional), **reset** one at a time or all at once, and a brand-new collection is
+created by writing its first document. Stubs read these documents at serve time via
+[`{{state.*}}` templating](/responses/#stateful-responses-the-state-directive) and mutate them
+through the `state` directive.
+
+### Access (`/access`)
+
+Issue and revoke the tenant's [sandbox API keys](/admin-api/#sandbox-api-keys). Issuing opens a
+one-time reveal dialog — **the token is shown exactly once**, with a copy button and a warning;
+afterwards the table lists only the display prefix, the optional hourly quota, and a live
+used-this-hour bar. Keys authenticate on the mock surface only when the host runs with
+[`--sandbox-auth`](/cli/#sandbox); they are never valid on the admin API.
 
 ### Extensions (`/extensions`)
 
