@@ -160,6 +160,14 @@ The `state` body is optional; omitted, it defaults to `Started`. See [scenarios]
 | `DELETE` | `/__admin/environments/{key}` | Remove a key |
 | `POST` | `/__admin/environments/reset` | Clear the tenant's keys |
 
+| Error code | HTTP |
+|------------|------|
+| `Environment.InvalidBody` | 400 |
+| `Environment.ReservedKey` | 400 |
+| `Environment.UnknownKey` | 404 |
+
+See [environments](/environments/) for the request and response shapes.
+
 ## Sandbox resources
 
 Tenant- and collection-scoped JSON documents — the data plane of the [integration sandbox](/the-dashboard/)
@@ -184,13 +192,6 @@ documents, `--resource-limit`; oldest evicted first).
 | `Resource.BodyTooLarge` | 413 |
 | `Resource.InvalidCollection` · `Resource.InvalidId` · `Resource.InvalidBody` | 422 |
 
-| Error code | HTTP |
-|------------|------|
-| `Environment.InvalidBody` | 400 |
-| `Environment.ReservedKey` | 400 |
-| `Environment.UnknownKey` | 404 |
-
-See [environments](/environments/) for the request and response shapes.
 
 ## Recordings
 
