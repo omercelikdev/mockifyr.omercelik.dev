@@ -160,6 +160,30 @@ The `state` body is optional; omitted, it defaults to `Started`. See [scenarios]
 | `DELETE` | `/__admin/environments/{key}` | Remove a key |
 | `POST` | `/__admin/environments/reset` | Clear the tenant's keys |
 
+## Sandbox resources
+
+Tenant- and collection-scoped JSON documents — the data plane of the [integration sandbox](/the-dashboard/)
+verticals. Bodies are opaque JSON: validated well-formed and size-capped at the edge (default 1 MiB,
+`--resource-max-body`), stored and re-served verbatim. Collections are bounded (default 1000
+documents, `--resource-limit`; oldest evicted first).
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/__admin/resources` | List the tenant's collections with document counts |
+| `GET` | `/__admin/resources/{collection}?limit=&offset=` | Page through a collection (`limit` 1..500, default 100) — returns `{documents, total}` |
+| `GET` | `/__admin/resources/{collection}/{id}` | Read one document |
+| `PUT` | `/__admin/resources/{collection}/{id}` | Create or replace a document (last-write-wins; the version advances) |
+| `DELETE` | `/__admin/resources/{collection}/{id}` | Delete one document — **404** when it does not exist |
+| `POST` | `/__admin/resources/{collection}/reset` | Clear one collection |
+| `POST` | `/__admin/resources/reset` | Clear every collection of the tenant |
+| `POST` | `/__admin/resources/{collection}/seed` | Seed from a JSON array — transactional; object elements may carry a string `id`, absent ids are generated |
+
+| Error code | HTTP |
+|------------|------|
+| `Resource.NotFound` | 404 |
+| `Resource.BodyTooLarge` | 413 |
+| `Resource.InvalidCollection` · `Resource.InvalidId` · `Resource.InvalidBody` | 422 |
+
 | Error code | HTTP |
 |------------|------|
 | `Environment.InvalidBody` | 400 |
