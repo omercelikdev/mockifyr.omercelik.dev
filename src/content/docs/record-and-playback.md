@@ -46,6 +46,16 @@ Transport headers are not baked into the generated stub, so a recorded mapping d
 connection-level noise that would make it fail to match on replay. The capture is faithful to the
 upstream — if the target answered a request with a 404, the generated stub replays that 404.
 
+## Repeated requests become a scenario
+
+Sending the same request (same method, URL and body) more than once during a session does not
+produce disconnected duplicates: the captures are chained into a generated
+[scenario](/scenarios/). The first capture serves in the `Started` state and advances the scenario,
+each later capture serves from the state the previous one set, and the last does not advance —
+so a replay returns the recorded responses **in the order they were recorded**. This also means an
+upstream whose answer changed between repeats replays faithfully. Distinct requests stay
+scenario-free. (Verified against the reference oracle; it generates the same chain.)
+
 ## Saving captured stubs
 
 In the dashboard's [Recordings page](/the-dashboard/), each captured stub can be inspected
