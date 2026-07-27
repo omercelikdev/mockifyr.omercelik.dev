@@ -57,7 +57,7 @@ version detection.
 | `GET` | `/__admin/mappings/{id}` | Fetch one stub | 200 `{id}` · 404 |
 | `PUT` | `/__admin/mappings/{id}` | Replace in place | 200 `{id, uuid}` · 422 |
 | `DELETE` | `/__admin/mappings/{id}` | Delete | 200, idempotent |
-| `POST` | `/__admin/mappings/import` | Load a `{"mappings":[…]}` bundle | 200 · 422 |
+| `POST` | `/__admin/mappings/import` | Load a `{"mappings":[…]}` bundle; a sibling `environments` section is [restored too](/environments/#export-and-import) | 200 · 422 |
 | `POST` | `/__admin/mappings/reset` | Clear the tenant's mappings | 200 |
 
 Each entry in the `GET /__admin/mappings` list is the stub's **own source JSON**, with `id` and `uuid`
