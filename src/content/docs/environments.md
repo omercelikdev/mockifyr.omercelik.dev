@@ -130,6 +130,39 @@ curl -X PUT http://localhost:8080/__admin/environments/baseUrl/active \
 | `Environment.ReservedKey` | 400 |
 | `Environment.UnknownKey` | 404 |
 
+## Export and import
+
+Exporting stubs from the dashboard carries the tenant's environments with them. With no keys defined
+the export is a plain mapping array, unchanged; with keys it becomes a `{"mappings":[…]}` bundle with
+a sibling `environments` section:
+
+```json
+{
+  "mappings": [ /* the stub definitions */ ],
+  "environments": [
+    {
+      "key": "baseUrl",
+      "activeValue": "staging",
+      "values": [
+        { "name": "staging", "value": "https://staging.example.com" },
+        { "name": "prod", "value": "https://api.example.com" }
+      ]
+    }
+  ]
+}
+```
+
+Importing such a bundle — through the dashboard's import tab or directly via
+[`POST /__admin/mappings/import`](/admin-api/) — restores the keys, their values, and the active
+selection **before** the mappings load, so the stubs' `{{key}}` references resolve immediately.
+
+- An imported key **replaces** an existing key of the same name: the import restores the exported
+  state rather than merging into it.
+- Each key passes the same validation as `PUT /__admin/environments/{key}`; an entry that fails
+  (a reserved name, no usable values) is skipped without failing the import — the mappings still load.
+- Older exports — a bare mapping array, or a bundle without an `environments` section — import
+  exactly as before.
+
 ## In the dashboard
 
 The **Environments** page lists the current tenant's keys, their named values, and which value is
@@ -143,8 +176,6 @@ active, and lets you switch the active value.
 - **The change feed does not cover environments.** On a multi-instance host with
   [`--change-feed`](/persistence/), stub changes propagate but environment key changes do not; other
   instances pick them up only after a restart.
-- **There is no import/export of environments alongside a mappings bundle.** Exporting stubs does not
-  carry the keys they reference, so a target host needs its keys defined separately.
 
 ## Related
 
