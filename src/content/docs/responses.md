@@ -59,6 +59,52 @@ templates. To enable it for every stub on the host, start the server with
 See [templating](/templating/) for the model and [template helpers](/template-helpers/) for the full
 helper reference.
 
+## Stateful responses: the `state` directive
+
+A stub response may declare a `state` directive — a sandbox CRUD operation on a tenant-scoped
+[resource collection](/admin-api/#sandbox-resources). `POST /orders` then *creates* a document that
+`GET /orders/{id}` *returns*:
+
+```json
+{
+  "request": { "method": "POST", "urlPath": "/api/orders" },
+  "response": {
+    "status": 201,
+    "body": "{\"id\":\"{{state.id}}\",\"order\":{{state.body}} }",
+    "state": { "operation": "create", "collection": "orders" }
+  }
+}
+```
+
+```json
+{
+  "request": { "method": "GET", "urlPathPattern": "/api/orders/[^/]+" },
+  "response": {
+    "status": 200,
+    "body": "{{state.body}}",
+    "state": { "operation": "read", "collection": "orders", "id": "{{request.pathSegments.[2]}}" }
+  }
+}
+```
+
+- `operation` — `create`, `read`, `update`, `delete` or `list`.
+- `id` / `document` — template expressions rendered against the request. An absent create `id` is
+  generated; an absent `document` stores the request body verbatim.
+- The result renders as `{{state.id}}`, `{{state.body}}`, `{{state.version}}`, `{{state.count}}`,
+  `{{state.list}}`. Declaring the directive enables templating for that response — no
+  `response-template` transformer needed.
+- `missStatus` — what read/update/delete answer for an unknown id (default **404**), with an empty
+  body, like a real API.
+- Serve-time guards mirror the admin API: a document over the body cap answers **413**, non-JSON
+  **422** — nothing half-lands.
+- State is tenant-scoped and shared with [`/__admin/resources`](/admin-api/#sandbox-resources):
+  what a stub creates, the dashboard and the admin API see immediately.
+
+:::caution
+Handlebars cannot parse `{{state.body}}}` — an expression followed immediately by a closing JSON
+brace reads as a broken triple-stache. Put a space before the brace: `{{state.body}} }`.
+:::
+
 ## Behaviour fields
 
 These also live on `response` and each has its own page.
