@@ -168,6 +168,23 @@ The `state` body is optional; omitted, it defaults to `Started`. See [scenarios]
 
 See [environments](/environments/) for the request and response shapes.
 
+## OpenAPI import
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `POST` | `/__admin/openapi/import?stateful=true` | OpenAPI 3.x (JSON or YAML) in the body → one stub per operation; with `stateful`, resource-shaped path pairs become live [state-directive](/responses/#stateful-responses-the-state-directive) CRUD stubs |
+
+Examples serve as-is; example-less schemas synthesize samples (Faker-backed for `uuid`/`email`/`uri`
+formats). External `$ref`s are refused with the offending pointer named — they are **never
+fetched** — and oversized or absurdly recursive specs answer typed 413/422s. The import is
+transactional: on any refusal, nothing is created. The dashboard offers the same import as the
+**OpenAPI** channel in the Add-stub flow.
+
+| Error code | HTTP |
+|------------|------|
+| `OpenApi.TooLarge` | 413 |
+| `OpenApi.ExternalRef` · `OpenApi.Invalid` · `OpenApi.Empty` · `OpenApi.TooDeep` | 422 |
+
 ## Sandbox resources
 
 Tenant- and collection-scoped JSON documents — the data plane of the [integration sandbox](/the-dashboard/)
