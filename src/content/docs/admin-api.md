@@ -209,6 +209,35 @@ documents, `--resource-limit`; oldest evicted first).
 | `Resource.BodyTooLarge` | 413 |
 | `Resource.InvalidCollection` · `Resource.InvalidId` · `Resource.InvalidBody` | 422 |
 
+## Sandbox API keys
+
+With [`--sandbox-auth`](/cli/#sandbox) enabled, tenants can hand out per-consumer credentials for
+the **mock surface**: an issued `mfk_…` token presented as `X-Api-Key: mfk_…` or
+`Authorization: Bearer mfk_…` selects the key's tenant ahead of the host/header chain. Requests
+without credentials keep resolving exactly as before; an invalid or revoked key is refused with
+**401** — never silently served from another tenant. A sandbox key is **not** admin
+authentication: `/__admin/*` refuses it on both carriers.
+
+The token is returned **once**, in the issuance response (`key`); afterwards only a 12-character
+display prefix is stored and listed — Mockifyr keeps a salted hash, never the token.
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/__admin/apikeys` | List the tenant's keys — `id`, `name`, `prefix`, `createdAt`, `quotaPerHour`, `usedThisHour` |
+| `POST` | `/__admin/apikeys` | Issue a key: `{"name": "ci", "quotaPerHour": 1000}` (`quotaPerHour` optional) → **201** with the one-time `key` |
+| `DELETE` | `/__admin/apikeys/{id}` | Revoke — the key stops authenticating immediately |
+
+A key with a `quotaPerHour` is rate limited over a fixed hourly window: counted responses carry
+`X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` (Unix seconds), and the
+request past the budget gets **429 Too Many Requests** with `Retry-After`. Keys without a quota
+are unlimited and carry no rate headers. Keys survive restarts on every
+[persistence backend](/persistence/); the hourly usage counter is in-memory and resets on restart.
+
+| Error code | HTTP |
+|------------|------|
+| `ApiKey.NotFound` | 404 |
+| `ApiKey.InvalidName` · `ApiKey.InvalidQuota` | 422 |
+
 
 ## Recordings
 
