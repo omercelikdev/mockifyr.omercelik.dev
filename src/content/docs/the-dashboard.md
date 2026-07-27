@@ -42,6 +42,14 @@ A grouped stub tree alongside a tabbed editor. Tabs are persisted per tenant, an
 offers pin, close others and close to the right. The editor has both a **form mode** and a **raw JSON
 mode**, and supports create, edit, delete and import. See [writing stubs](/writing-stubs/).
 
+A **Test** button in the editor (HTTP and GraphQL stubs) opens a request runner: method, URL and
+**Send** on top, with **Params**, **Headers** and **Body** sections below, pre-filled from the stub's
+exact-match matchers. The request is a real one — it runs the full serving pipeline, so
+[environment keys](/environments/) resolve, [scenarios](/scenarios/) advance, and the call lands in
+the journal. The response (status, timing, size, headers, pretty-printed body) renders in the dialog,
+with copy-body and copy-as-curl actions; connection failures show inline. Testing an unsaved edit is
+fine — the runner reads the editor's current values, and reopening it re-seeds from them.
+
 ### Journal (`/journal`)
 
 Every served request with its method, URL, status and matched-versus-unmatched result. An
