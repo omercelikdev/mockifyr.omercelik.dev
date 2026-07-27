@@ -49,6 +49,8 @@ See [HTTPS, HTTP/2 and mTLS](/https-and-mtls/).
 | `--smtp-port <n>` | unset | Starts the ESMTP capture listener: real mail in, realistic replies out, everything captured into the tenant inbox. The AUTH username selects the tenant. See [Email & SMS mocking](/messages/). |
 | `--sms-profile twilio` | unset | Mounts Twilio's send-message endpoint on the mock surface — the official SDK works unchanged; every send is captured. A stub on the same URL still wins. |
 | `--message-limit <n>` | `1000` | Per-tenant inbox bound; the oldest message is evicted first. |
+| `--resource-limit <n>` | `1000` | Per-collection sandbox document bound (`/__admin/resources`); the oldest document is evicted first. |
+| `--resource-max-body <bytes>` | `1048576` | Per-document body cap for sandbox resources; larger documents are refused with **413**. |
 
 ### Admin authentication
 
