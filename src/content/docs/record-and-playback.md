@@ -18,6 +18,12 @@ curl -X POST http://localhost:8080/__admin/recordings/start \
 Now drive traffic through Mockifyr's mock surface as usual; each request is forwarded to the target and
 recorded.
 
+:::note
+While a session is live, **every** request is proxied — including requests an existing stub would
+match. Existing stubs answer again once the recording stops. (Verified against the reference oracle;
+it behaves the same way.)
+:::
+
 ## Endpoints
 
 | Endpoint | Result |
@@ -37,7 +43,15 @@ tearing the session down.
 - The captured status, body and response headers.
 
 Transport headers are not baked into the generated stub, so a recorded mapping does not carry
-connection-level noise that would make it fail to match on replay.
+connection-level noise that would make it fail to match on replay. The capture is faithful to the
+upstream — if the target answered a request with a 404, the generated stub replays that 404.
+
+## Saving captured stubs
+
+In the dashboard's [Recordings page](/the-dashboard/), each captured stub can be inspected
+(**View JSON**) and saved into the current tenant — per stub with **Add to stubs**, or all at once
+with **Import all**. Both go through the same bulk-import path as `POST /__admin/mappings/import`,
+so a captured bundle can equally be saved over the admin API.
 
 :::caution
 The recording session is **global, not tenant-scoped** — unlike nearly everything else in Mockifyr.

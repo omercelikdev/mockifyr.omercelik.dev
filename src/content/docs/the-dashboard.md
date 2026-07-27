@@ -65,8 +65,10 @@ that state — and **Reset all** returns every scenario to its start state. See
 
 ### Recordings (`/recordings`)
 
-A target base URL and **Start**, live session status, then **Snapshot** and **Stop**. Captured stubs are
-listed with their raw JSON. See [record and playback](/record-and-playback/).
+A target base URL and **Start**, live session status, then **Snapshot** and **Stop**. Captured stubs
+are listed with an expandable **View JSON** of the generated mapping, and can be saved into the
+current tenant — per stub with **Add to stubs**, or all at once with **Import all**. See
+[record and playback](/record-and-playback/).
 
 ### Environments (`/environments`)
 
