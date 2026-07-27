@@ -42,6 +42,10 @@ A grouped stub tree alongside a tabbed editor. Tabs are persisted per tenant, an
 offers pin, close others and close to the right. The editor has both a **form mode** and a **raw JSON
 mode**, and supports create, edit, delete and import. See [writing stubs](/writing-stubs/).
 
+The Add-stub flow's channel chooser includes **OpenAPI**: paste a 3.x document (JSON or YAML),
+optionally enable **Stateful CRUD**, and every operation imports as an ordinary stub — see the
+[admin API](/admin-api/#openapi-import) for the equivalent endpoint.
+
 A **Test** button in the editor (HTTP and GraphQL stubs) opens a request runner: method, URL and
 **Send** on top, with **Params**, **Headers** and **Body** sections below, pre-filled from the stub's
 exact-match matchers. The request is a real one — it runs the full serving pipeline, so
