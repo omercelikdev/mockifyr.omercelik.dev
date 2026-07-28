@@ -1,12 +1,16 @@
 import { defineConfig } from 'astro/config'
 import starlight from '@astrojs/starlight'
 
+import cloudflare from "@astrojs/cloudflare";
+
 // Landing (splash) + docs in one Starlight site, deployed to Cloudflare Pages.
 // Set `site` to the final URL for correct canonical/OG links + sitemap.
 export default defineConfig({
   site: 'https://mockifyr.omercelik.dev',
+
   // The migration guide moved to a neutral slug; the old URL stays alive for inbound links.
   redirects: { '/migrating-from-wiremock/': '/migration/' },
+
   integrations: [
     starlight({
       title: 'Mockifyr',
@@ -103,4 +107,6 @@ export default defineConfig({
       ],
     }),
   ],
+
+  adapter: cloudflare()
 })
