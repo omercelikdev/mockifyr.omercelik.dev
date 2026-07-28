@@ -119,7 +119,7 @@ broken stub.
 | Multi-message streams | No |
 | Bidirectional streaming | No |
 
-The unsupported cases are not an oversight of scope. The WireMock gRPC extension does not implement
+The unsupported cases are not an oversight of scope. The reference gRPC extension does not implement
 them either, so there is no reference implementation to differentially test Mockifyr against — and
 Mockifyr does not ship behaviour it cannot verify against the oracle.
 

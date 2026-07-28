@@ -73,7 +73,7 @@ The root object differs by context:
 
 :::note
 On `date`, a `timezone=` argument is deliberately ignored when the input is an already-parsed instant.
-This matches WireMock, so the two produce identical output; it is not an oversight.
+This matches the reference engine, so the two produce identical output; it is not an oversight.
 :::
 
 ## Random helpers

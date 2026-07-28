@@ -1,9 +1,9 @@
 ---
 title: Writing stubs
-description: The shape of a Mockifyr / WireMock stub — request matching and response.
+description: The shape of a Mockifyr stub — request matching and response.
 ---
 
-A stub is a **request pattern** paired with a **response**. Mockifyr reads the WireMock JSON format, so
+A stub is a **request pattern** paired with a **response**. Mockifyr reads the industry-standard mapping JSON format, so
 existing stubs work unchanged.
 
 ```json
@@ -73,4 +73,4 @@ the admin API, scope everything — a tenant can never see another's stubs. See
 
 - [Request matching](/request-matching/) — every matcher
 - [Responses](/responses/) — every response field
-- [Migrating from WireMock](/migrating-from-wiremock/) — bring your existing stubs
+- [Migration guide](/migration/) — bring your existing stubs

@@ -60,7 +60,7 @@ helper popup currently lists a few of these in error — the engine is the autho
 
 :::note
 Helper arguments use **single quotes** — `'$.field'`. Mockifyr serialises a templated `jsonBody`
-verbatim, the same way WireMock does, so single-quoted arguments resolve correctly.
+verbatim, the same way the reference engine does, so single-quoted arguments resolve correctly.
 :::
 
 ## Related

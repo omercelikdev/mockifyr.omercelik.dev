@@ -33,7 +33,7 @@ which is set for the target.
 ```
 
 :::note
-`removeProxyRequestHeaders` is deliberately **not** implemented. WireMock forwards the named header
+`removeProxyRequestHeaders` is deliberately **not** implemented. The reference engine forwards the named header
 anyway, so honouring the field would diverge from the oracle Mockifyr is differential-tested against.
 Response-header rewriting is not implemented either.
 :::

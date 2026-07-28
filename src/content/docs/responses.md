@@ -126,7 +126,7 @@ content type. There is no per-content-type exclusion list.
 ## Output shape quirks
 
 Some rendered output is formatted in ways that look inconsistent on their own. These shapes are
-preserved deliberately, because WireMock produces them and differential parity is the definition of
+preserved deliberately, because the reference engine produces them and differential parity is the definition of
 correct here.
 
 | Case | Rendered as |
@@ -136,6 +136,6 @@ correct here.
 | `toJson` output containing arrays | Spaced |
 
 :::note
-Do not treat these as bugs to normalize away. If you compare Mockifyr output against a recorded
-WireMock response byte for byte, matching these shapes is what makes the comparison pass.
+Do not treat these as bugs to normalize away. If you compare Mockifyr output against a response
+recorded from the reference engine byte for byte, matching these shapes is what makes the comparison pass.
 :::

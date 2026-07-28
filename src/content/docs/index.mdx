@@ -1,9 +1,9 @@
 ---
 title: Mockifyr
-description: An independent, .NET-based API mock engine + platform — a functional WireMock alternative, in one image.
+description: An independent, .NET-based API mock engine + integration sandbox platform — enterprise-ready, in one image.
 template: splash
 hero:
-  tagline: A transport-agnostic API mock engine + dashboard. Import your WireMock stubs, run one command, done. Correctness proven differentially against real WireMock.
+  tagline: A transport-agnostic API mock engine + dashboard. Import your existing stub bundles or an OpenAPI spec, run one command, done. Correctness proven differentially against a real reference engine.
   image:
     light: ../../assets/logo-light.svg
     dark: ../../assets/logo-dark.svg
@@ -33,8 +33,8 @@ docker run -p 8080:8080 ghcr.io/omercelikdev/mockifyr
 - **Dashboard** — `http://localhost:8080/__mockifyr`
 
 <CardGrid>
-  <Card title="WireMock-compatible" icon="approve-check">
-    Imports the WireMock JSON stub format — [matching](/request-matching/),
+  <Card title="Drop-in stub import" icon="approve-check">
+    Imports the industry-standard mapping JSON stub format — [matching](/request-matching/),
     [templating](/templating/), [faults](/delays-and-faults/), [scenarios](/scenarios/),
     [proxying](/proxying/) and [record & playback](/record-and-playback/).
   </Card>
@@ -43,7 +43,7 @@ docker run -p 8080:8080 ghcr.io/omercelikdev/mockifyr
     recordings and settings — in six languages. [Take the tour](/the-dashboard/).
   </Card>
   <Card title="Differentially verified" icon="random">
-    Correctness is proven against Java WireMock in CI, not self-assessed. Everything that
+    Correctness is proven against a real reference engine in CI, not self-assessed. Everything that
     testing left out is written down in [known limitations](/limitations/).
   </Card>
   <Card title="Multi-protocol" icon="puzzle">
@@ -63,9 +63,9 @@ docker run -p 8080:8080 ghcr.io/omercelikdev/mockifyr
 ## Honest about the gaps
 
 Mockifyr is verified by running the same scenario through both engines and diffing the result — the
-reference is a real WireMock instance, not a claim. Where a behaviour is deliberately not reproduced,
+reference is a real engine instance, not a claim. Where a behaviour is deliberately not reproduced,
 it is recorded rather than glossed over: the delay distributions that are parsed, the matchers that
-belong to WireMock Cloud, the helpers that do not exist despite appearing in some references.
+exist only in commercial cloud editions, the helpers that do not exist despite appearing in some references.
 
 Read [known limitations](/limitations/) before you migrate. It is the page most likely to save you an
 afternoon.
