@@ -30,12 +30,12 @@ and a **fault** ends the request without a usable response.
 
 :::caution
 `uniform` is the **only** distribution Mockifyr parses. Any other `delayDistribution` — including
-WireMock's `lognormal` — is **silently ignored**: the stub is accepted, no error is reported, and the
+the mapping format's `lognormal` — is **silently ignored**: the stub is accepted, no error is reported, and the
 response comes back with no delay at all. If a delay you configured never seems to happen, check the
 `type` first.
 :::
 
-WireMock's `chunkedDribbleDelay` is likewise not implemented.
+`chunkedDribbleDelay` is likewise not implemented.
 
 ## Faults
 

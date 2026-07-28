@@ -102,7 +102,7 @@ Repeated request headers are folded by the differential test harness, so header 
 behaviour is not claimed here.
 :::
 
-`matchesJsonSchema` does not support WireMock's `V4` (Draft 4) — the underlying schema library has no
+`matchesJsonSchema` does not support `V4` (JSON Schema Draft 4) — the underlying schema library has no
 Draft 4 implementation.
 
 ## Multipart bodies
@@ -120,7 +120,7 @@ array as a whole is governed by `matchingType`, which is `ANY` or `ALL` and defa
 ```
 
 :::note
-A `name` field on a multipart pattern is a documented no-op. WireMock ignores it too, so stubs
+A `name` field on a multipart pattern is a documented no-op. The reference engine ignores it too, so stubs
 carrying one are accepted unchanged but the field has no effect on matching.
 :::
 
@@ -175,8 +175,8 @@ traffic.
 
 | Matcher | Why |
 |---------|-----|
-| `clientIp` | WireMock Cloud only; the open-source WireMock oracle rejects it with 422 |
-| `equalToNumber`, `greaterThanNumber` and siblings | Standalone number matchers are WireMock Cloud only; the oracle rejects them with 422 |
+| `clientIp` | Commercial cloud edition only; the open-source reference oracle rejects it with 422 |
+| `equalToNumber`, `greaterThanNumber` and siblings | Standalone number matchers are commercial cloud-edition only; the oracle rejects them with 422 |
 
 Because the open-source oracle refuses these itself, there is no reference behaviour to differentially
 test against. See [limitations](/limitations/) for the full list of deferred edges.

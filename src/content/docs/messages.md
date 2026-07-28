@@ -90,7 +90,7 @@ Per tenant, via the dashboard's **Channel behaviors** sheet or
 
 ## Validation & limits
 
-WireMock has no message channels, so there is no oracle here: these features are validated by
+No reference oracle exists for message channels, so these features are validated by
 **real-client self-tests** — MailKit drives the SMTP facade, the **official Twilio C# SDK** drives
 the profile — plus mutation testing on the message logic. Current limits (tracked, not silent):
 the inbox is in-memory only; there is no inbound simulation (Mockifyr never initiates a message to

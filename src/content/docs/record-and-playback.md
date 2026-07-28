@@ -72,8 +72,8 @@ instance.
 
 ## Not implemented
 
-| WireMock feature | Status |
-|------------------|--------|
+| Mapping-format feature | Status |
+|------------------------|--------|
 | Record `filters` | Not implemented |
 | `allowNonProxied` | Not implemented |
 | Body-file (`__files`) extraction | Not implemented — bodies stay inline |

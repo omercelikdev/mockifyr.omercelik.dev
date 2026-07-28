@@ -56,7 +56,7 @@ and a mappings-only mount silently loses those when the container is recreated. 
 
 ### Preload stub files from your host
 
-To load a folder of WireMock `*.json` files, bind-mount it. Only the path syntax differs per shell:
+To load a folder of mapping `*.json` files, bind-mount it. Only the path syntax differs per shell:
 
 ```bash
 docker run -p 8080:8080 -v "$PWD/mappings:/work/mappings" ghcr.io/omercelikdev/mockifyr   # macOS / Linux
@@ -95,5 +95,5 @@ readable as an environment variable of the same name**, which is why `-e admin-u
 - [Take the dashboard tour](/the-dashboard/) — what each page does.
 - [Write stubs](/writing-stubs/) — [matching](/request-matching/) and [responses](/responses/).
 - [Secure the admin API](/securing-the-admin-api/) with a username and password.
-- [Migrate from WireMock](/migrating-from-wiremock/), then skim
+- [Bring your existing stubs](/migration/), then skim
   [known limitations](/limitations/) — it is the page most likely to save you an afternoon.

@@ -66,7 +66,7 @@ the default tenant. If you rely on [named tenants](/multi-tenancy/), do not expe
 `<dir>/mappings` folder to restore them.
 :::
 
-WireMock's per-stub `persistent: false` opt-out is **not supported**. When a root dir is set, every
+The mapping format's per-stub `persistent: false` opt-out is **not supported**. When a root dir is set, every
 admin mutation persists — there is no way to create a stub that is deliberately transient.
 
 ## Docker

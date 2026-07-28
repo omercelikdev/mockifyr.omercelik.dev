@@ -3,6 +3,13 @@ title: Migrating from WireMock
 description: Import your existing WireMock stubs into Mockifyr, and the differences worth knowing first.
 ---
 
+:::note
+WireMock is a trademark of WireMock Inc. Mockifyr is an independent project and is not affiliated
+with, endorsed by, or sponsored by WireMock Inc. The name is used here nominatively, to describe
+interoperability. This is the only page on this site that names it; everywhere else the docs say
+"the reference engine".
+:::
+
 Mockifyr reads the WireMock JSON stub format, so migrating is mostly **import and go**.
 
 ## Import your stubs

@@ -1,9 +1,10 @@
 ---
 title: Known limitations
-description: What Mockifyr deliberately does not do, and where its WireMock parity stops.
+description: What Mockifyr deliberately does not do, and where its reference parity stops.
 ---
 
-Mockifyr's correctness is proven **differentially against real Java WireMock** in CI: the same scenario
+Mockifyr's correctness is proven **differentially against a real reference engine** in CI (the
+OSS engine named in the [migration guide](/migration/)): the same scenario
 is loaded into both, the same request is driven through both, and the responses are compared. This page
 lists what that testing has deliberately left out or deferred — so you find it here rather than the hard
 way.
@@ -34,7 +35,7 @@ See [responses](/responses/).
 | `matchesJsonPath` | Filter functions such as `.length()`, and some type-coercion edges, are deferred |
 | XML | Explicit `namespaceAwareness` modes and mixed content are deferred |
 
-`clientIp` and the standalone number matchers are **WireMock Cloud** features that open-source WireMock
+`clientIp` and the standalone number matchers are **commercial cloud-edition** features that the open-source reference engine
 itself rejects, so there is no oracle to test against and Mockifyr does not support them.
 
 Date/time matching does not support:
@@ -69,7 +70,7 @@ failed request. See [delays and faults](/delays-and-faults/).
 
 ## Proxying
 
-- `removeProxyRequestHeaders` is **deliberately** not implemented — WireMock itself still forwards the
+- `removeProxyRequestHeaders` is **deliberately** not implemented — the reference engine itself still forwards the
   header, so implementing it would diverge from the oracle rather than match it.
 - Response-header rewriting is not implemented.
 
@@ -91,7 +92,7 @@ See [record and playback](/record-and-playback/).
 
 ## Unmatched requests
 
-When nothing matches, only the **404 status** is served. WireMock's verbose near-miss diagnostic body is
+When nothing matches, only the **404 status** is served. The reference engine's verbose near-miss diagnostic body is
 not reproduced.
 
 :::tip
@@ -102,7 +103,7 @@ To diagnose a request that didn't match, use `GET /__admin/requests?unmatched=tr
 ## Persistence
 
 - Reload from a plain mappings directory covers only the **default tenant**, at startup.
-- WireMock's per-stub `persistent: false` opt-out is not supported: with a root directory set, **every**
+- The mapping format's per-stub `persistent: false` opt-out is not supported: with a root directory set, **every**
   admin mutation persists.
 - The change feed does not cover environments, so multi-instance hosts pick up
   [environment](/environments/) changes only after a restart.
@@ -112,7 +113,7 @@ See [persistence](/persistence/).
 
 ## gRPC
 
-Multi-message streams and bidirectional streaming are not supported: the WireMock gRPC extension lacks
+Multi-message streams and bidirectional streaming are not supported: the reference gRPC extension lacks
 them, so there is no oracle to test against. There is also no gRPC-specific admin reset. See
 [gRPC](/grpc/).
 
@@ -122,7 +123,7 @@ Per-path or per-pattern `channelTarget`, binary frames, and listing or resetting
 not supported.
 
 :::note
-WireMock's own WebSocket support is in **beta**, so this area is validated by self-test rather than
+The reference engine's WebSocket support is in **beta**, so this area is validated by self-test rather than
 differentially against the oracle. Treat its parity claims as weaker than the rest of the engine's.
 :::
 
@@ -142,7 +143,7 @@ See [extending Mockifyr](/extending/).
 
 ## Anything else
 
-If Mockifyr behaves differently from WireMock in a way that is **not** on this list, that is a bug worth
+If Mockifyr behaves differently from the reference engine in a way that is **not** on this list, that is a bug worth
 reporting at <https://github.com/omercelikdev/mockifyr/issues>. Per-feature parity notes — including the
 behaviours the differential harness discovered — live in the repository's `docs/parity/` directory.
 

@@ -5,10 +5,12 @@ import starlight from '@astrojs/starlight'
 // Set `site` to the final URL for correct canonical/OG links + sitemap.
 export default defineConfig({
   site: 'https://mockifyr.omercelik.dev',
+  // The migration guide moved to a neutral slug; the old URL stays alive for inbound links.
+  redirects: { '/migrating-from-wiremock/': '/migration/' },
   integrations: [
     starlight({
       title: 'Mockifyr',
-      description: 'An independent, .NET-based API mock engine + platform — a functional WireMock alternative.',
+      description: 'An independent, .NET-based API mock engine + integration sandbox platform.',
       // Two files rather than one using `currentColor`: Starlight renders the logo as an <img>, which
       // cannot inherit the page's colour, so the mark ships once per theme.
       logo: {
@@ -95,7 +97,7 @@ export default defineConfig({
             { label: 'Admin API', slug: 'admin-api' },
             { label: 'Extending Mockifyr', slug: 'extending' },
             { label: 'Known limitations', slug: 'limitations' },
-            { label: 'Migrating from WireMock', slug: 'migrating-from-wiremock' },
+            { label: 'Migration guide', slug: 'migration' },
           ],
         },
       ],

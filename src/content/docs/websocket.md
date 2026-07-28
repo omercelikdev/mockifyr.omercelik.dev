@@ -7,11 +7,11 @@ Mockifyr accepts WebSocket connections and replies to inbound messages from **me
 trigger that matches the message body, and one or more send actions whose payload is templated.
 
 :::caution
-This is the one area of Mockifyr that is **not** validated against the WireMock oracle. WireMock's own
-WebSocket support is still beta and is not present in the pinned reference image, so there is no stable
+This is the one area of Mockifyr that is **not** validated against the reference oracle. The reference
+engine's WebSocket support is still beta and is not present in the pinned reference image, so there is no stable
 implementation to differentially test against. WebSocket serving is validated by **self-test**: a real
 client drives a live host and the replies are asserted directly. Everywhere else in Mockifyr, "correct"
-means "byte-identical to real WireMock"; here it means "does what this page says".
+means "byte-identical to the reference engine"; here it means "does what this page says".
 :::
 
 ## Connecting
@@ -95,7 +95,7 @@ For a connect-time mapping there is no inbound message, so templates render agai
 { "type": "send", "message": { "body": { "filePath": "welcome.json" } } }
 ```
 
-The name resolves under `<root-dir>/__files`, WireMock's convention — see
+The name resolves under `<root-dir>/__files`, the mapping format's convention — see
 [persistence](/persistence/).
 
 :::caution
