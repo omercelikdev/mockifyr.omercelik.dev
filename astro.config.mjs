@@ -4,7 +4,7 @@ import starlight from '@astrojs/starlight'
 // Landing (splash) + docs in one Starlight site, deployed to Cloudflare Pages.
 // Set `site` to the final URL for correct canonical/OG links + sitemap.
 export default defineConfig({
-  site: 'https://mockifyr.omercelik.dev',
+  site: 'https://mockifyr.qorpe.com',
   // The migration guide moved to a neutral slug; the old URL stays alive for inbound links.
   redirects: { '/migrating-from-wiremock/': '/migration/' },
   integrations: [
@@ -30,11 +30,11 @@ export default defineConfig({
       // one that never arrived. Absolute URLs are required here: a scraper resolves these without a
       // document base.
       head: [
-        { tag: 'meta', attrs: { property: 'og:image', content: 'https://mockifyr.omercelik.dev/og.png' } },
+        { tag: 'meta', attrs: { property: 'og:image', content: 'https://mockifyr.qorpe.com/og.png' } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
         { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
         { tag: 'meta', attrs: { property: 'og:image:alt', content: 'Mockifyr — an independent .NET API mock engine and platform' } },
-        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://mockifyr.omercelik.dev/og.png' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://mockifyr.qorpe.com/og.png' } },
       ],
       customCss: ['./src/styles/mockifyr.css'],
       // Reproduce the dashboard's near-black accent for chrome; docs use --violet as the lively accent.

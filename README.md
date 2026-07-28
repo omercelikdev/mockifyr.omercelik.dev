@@ -1,8 +1,8 @@
-# mockifyr.omercelik.dev
+# mockifyr.qorpe.com
 
 Marketing + docs site for [Mockifyr](https://github.com/omercelikdev/mockifyr) —
 built with **Astro + Starlight**, themed with Mockifyr's design tokens. Deploys to
-**Cloudflare Pages** at `mockifyr.omercelik.dev`.
+**Cloudflare Pages** at `mockifyr.qorpe.com`.
 
 ## Develop
 
@@ -26,7 +26,7 @@ npm run preview
    - **Framework preset:** Astro
    - **Build command:** `npm run build`
    - **Build output directory:** `dist`
-4. **Custom domain:** add `mockifyr.omercelik.dev` (if the zone `omercelik.dev` is on Cloudflare, DNS is
+4. **Custom domain:** add `mockifyr.qorpe.com` (if the zone `omercelik.dev` is on Cloudflare, DNS is
    wired automatically).
 
 Every push to `main` deploys; PRs get preview URLs.
