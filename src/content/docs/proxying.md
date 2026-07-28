@@ -61,7 +61,7 @@ rather than an opaque 500, so the journal tells you what happened instead of lea
 
 ```bash
 # disable the retry — a refused loopback proxy then returns a plain 500
-docker run -p 8080:8080 ghcr.io/omercelikdev/mockifyr --outbound-host-fallback false
+docker run -p 8080:8080 ghcr.io/qorpe/mockifyr --outbound-host-fallback false
 ```
 
 :::caution

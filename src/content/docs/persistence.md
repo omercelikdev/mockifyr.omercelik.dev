@@ -18,7 +18,7 @@ whether you run in-memory or against PostgreSQL.
 | Redis | `--redis <connstr>` | Hash `mockifyr:stubs:{tenant}` keyed by stub id |
 
 ```bash
-docker run -p 8080:8080 -v mockifyr-data:/work ghcr.io/omercelikdev/mockifyr
+docker run -p 8080:8080 -v mockifyr-data:/work ghcr.io/qorpe/mockifyr
 docker compose -f docker-compose.postgres.yml up
 docker compose -f docker-compose.redis.yml up
 ```
@@ -77,10 +77,10 @@ all of it survives restarts *and* container recreation:
 
 ```bash
 # named volume — stubs, environments, __files and grpc descriptors all survive
-docker run -p 8080:8080 -v mockifyr-data:/work ghcr.io/omercelikdev/mockifyr
+docker run -p 8080:8080 -v mockifyr-data:/work ghcr.io/qorpe/mockifyr
 
 # plus a bind overlay for the stubs you edit by hand — they live in ./mappings on your host
-docker run -p 8080:8080 -v mockifyr-data:/work -v "$PWD/mappings:/work/mappings" ghcr.io/omercelikdev/mockifyr
+docker run -p 8080:8080 -v mockifyr-data:/work -v "$PWD/mappings:/work/mappings" ghcr.io/qorpe/mockifyr
 ```
 
 :::caution
@@ -103,7 +103,7 @@ resets each run — imported stubs and environment configuration included. Mount
 `/work` (and optionally keep the container alive between runs):
 
 ```csharp
-var mockifyr = builder.AddContainer("mockifyr", "ghcr.io/omercelikdev/mockifyr")
+var mockifyr = builder.AddContainer("mockifyr", "ghcr.io/qorpe/mockifyr")
     .WithHttpEndpoint(port: 8080, targetPort: 8080)
     .WithVolume("mockifyr-data", "/work")            // survives restarts and recreation
     .WithLifetime(ContainerLifetime.Persistent);     // optional: reuse the container across runs

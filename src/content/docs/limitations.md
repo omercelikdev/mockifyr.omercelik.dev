@@ -144,7 +144,7 @@ See [extending Mockifyr](/extending/).
 ## Anything else
 
 If Mockifyr behaves differently from the reference engine in a way that is **not** on this list, that is a bug worth
-reporting at <https://github.com/omercelikdev/mockifyr/issues>. Per-feature parity notes — including the
+reporting at <https://github.com/qorpe/mockifyr/issues>. Per-feature parity notes — including the
 behaviours the differential harness discovered — live in the repository's `docs/parity/` directory.
 
 ## Message channels (email & SMS)

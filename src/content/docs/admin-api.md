@@ -80,6 +80,11 @@ See [writing stubs](/writing-stubs/).
 
 ## Request journal
 
+The journal is **bounded per tenant** (default 1000 entries, oldest evicted first — configure with
+[`--journal-limit`](/cli/#request-journal), disable with `--journal-disabled`). Counts and
+verification only see retained entries, matching the reference engine's journal-cap semantics.
+
+
 | Method | Path | Purpose | Response |
 |--------|------|---------|----------|
 | `POST` | `/__admin/requests/count` | Count requests matching a pattern | `{count:n}` |

@@ -12,6 +12,13 @@ The **mock-serving surface stays open** — clients hit your stubs without crede
 Only the admin API and dashboard are protected.
 :::
 
+:::note
+`/__admin/health` is **exempt** from admin Basic auth: Kubernetes/OpenShift probes cannot carry
+credentials, and a 401 health check would send the pod into a restart loop. The endpoint is
+read-only and exposes only name, version, persistence, and tenant count; every other `/__admin`
+route stays guarded.
+:::
+
 ## Enable it
 
 Two settings, always given together — `admin-user` and `admin-pass`. If only one is set, auth stays
@@ -27,7 +34,7 @@ when both are present. Prefer the environment for credentials; see the [CLI refe
 ```bash
 docker run -p 8080:8080 \
   -e admin-user=alice -e admin-pass='s3cret' \
-  ghcr.io/omercelikdev/mockifyr
+  ghcr.io/qorpe/mockifyr
 ```
 
 ### Docker Compose
@@ -38,7 +45,7 @@ Keep the password out of the file with a git-ignored `.env`:
 # docker-compose.yml
 services:
   mockifyr:
-    image: ghcr.io/omercelikdev/mockifyr:latest
+    image: ghcr.io/qorpe/mockifyr:latest
     ports: ['8080:8080']
     environment:
       admin-user: ${MOCKIFYR_USER}
@@ -54,7 +61,7 @@ MOCKIFYR_PASS=s3cret
 ### Command-line flags
 
 ```bash
-docker run -p 8080:8080 ghcr.io/omercelikdev/mockifyr --admin-user alice --admin-pass 's3cret'
+docker run -p 8080:8080 ghcr.io/qorpe/mockifyr --admin-user alice --admin-pass 's3cret'
 # local:
 dotnet run --project src/Mockifyr.Server -- --admin-user alice --admin-pass 's3cret'
 ```

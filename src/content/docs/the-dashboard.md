@@ -7,7 +7,7 @@ Mockifyr ships a browser dashboard at `/__mockifyr`, on the **same port as the m
 Docker image it is on by default; a self-hosted run turns it on with `--dashboard <dir>`.
 
 ```bash
-docker run -p 8080:8080 ghcr.io/omercelikdev/mockifyr
+docker run -p 8080:8080 ghcr.io/qorpe/mockifyr
 # → http://localhost:8080/__mockifyr
 ```
 

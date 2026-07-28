@@ -68,5 +68,5 @@ standalone number matchers belong to WireMock Cloud and the open-source WireMock
 implementing it would diverge.
 
 If a stub behaves differently from WireMock and is not listed in [known limitations](/limitations/),
-that is a bug — please [report it](https://github.com/omercelikdev/mockifyr/issues). Per-feature parity
+that is a bug — please [report it](https://github.com/qorpe/mockifyr/issues). Per-feature parity
 notes live in the repository's `docs/parity/` directory.

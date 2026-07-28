@@ -89,7 +89,7 @@ the container's own loopback. A refused loopback callback is retried once via `h
 and **both attempts appear in the journal**, so you can see the fallback happen.
 
 ```bash
-docker run -p 8080:8080 ghcr.io/omercelikdev/mockifyr --outbound-host-fallback false
+docker run -p 8080:8080 ghcr.io/qorpe/mockifyr --outbound-host-fallback false
 ```
 
 :::note

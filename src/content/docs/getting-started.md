@@ -10,7 +10,7 @@ Mockifyr ships as a single image — the mock engine, the admin API, and the das
 The same one line on **macOS, Linux, and Windows** — no volume, no flags:
 
 ```bash
-docker run -p 8080:8080 ghcr.io/omercelikdev/mockifyr
+docker run -p 8080:8080 ghcr.io/qorpe/mockifyr
 ```
 
 That's it. Three surfaces are now live:
@@ -46,7 +46,7 @@ identical on every OS:
 
 ```bash
 docker compose up                                # stubs live in ./mappings, next to you
-docker run -p 8080:8080 -v mockifyr-data:/work ghcr.io/omercelikdev/mockifyr   # named volume
+docker run -p 8080:8080 -v mockifyr-data:/work ghcr.io/qorpe/mockifyr   # named volume
 ```
 
 Mount **`/work`**, not just `/work/mappings` — the file store also keeps
@@ -59,7 +59,7 @@ and a mappings-only mount silently loses those when the container is recreated. 
 To load a folder of mapping `*.json` files, bind-mount it. Only the path syntax differs per shell:
 
 ```bash
-docker run -p 8080:8080 -v "$PWD/mappings:/work/mappings" ghcr.io/omercelikdev/mockifyr   # macOS / Linux
+docker run -p 8080:8080 -v "$PWD/mappings:/work/mappings" ghcr.io/qorpe/mockifyr   # macOS / Linux
 #   PowerShell:  -v "${PWD}/mappings:/work/mappings"       CMD:  -v "%cd%/mappings:/work/mappings"
 ```
 

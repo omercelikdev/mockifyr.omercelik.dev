@@ -19,7 +19,7 @@ export default defineConfig({
         replacesTitle: false,
       },
       social: {
-        github: 'https://github.com/omercelikdev/mockifyr',
+        github: 'https://github.com/qorpe/mockifyr',
       },
       // Versioned so the mark replaces the old placeholder tile on the next visit. Browsers cache a
       // favicon far past a normal asset, and the file keeps its conventional path, so the query is
