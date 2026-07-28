@@ -9,7 +9,7 @@ The host builds its configuration with the standard .NET configuration builder, 
 readable as an environment variable of the same name**. That is why this works:
 
 ```bash
-docker run -p 8080:8080 -e admin-user=alice -e admin-pass='s3cret' ghcr.io/omercelikdev/mockifyr
+docker run -p 8080:8080 -e admin-user=alice -e admin-pass='s3cret' ghcr.io/qorpe/mockifyr
 ```
 
 Command-line arguments win over environment variables when both supply the same key.
@@ -49,6 +49,13 @@ See [HTTPS, HTTP/2 and mTLS](/https-and-mtls/).
 | `--smtp-port <n>` | unset | Starts the ESMTP capture listener: real mail in, realistic replies out, everything captured into the tenant inbox. The AUTH username selects the tenant. See [Email & SMS mocking](/messages/). |
 | `--sms-profile twilio` | unset | Mounts Twilio's send-message endpoint on the mock surface — the official SDK works unchanged; every send is captured. A stub on the same URL still wins. |
 | `--message-limit <n>` | `1000` | Per-tenant inbox bound; the oldest message is evicted first. |
+
+### Request journal
+
+| Flag | Default | Effect |
+|------|---------|--------|
+| `--journal-limit <n>` | `1000` | Per-tenant request-journal bound; the oldest entry is evicted first. `<=0` means unbounded. `--max-request-journal-entries` is a kept alias. |
+| `--journal-disabled` | off | Record nothing in the request journal — for load tests where the journal is pure overhead. `--no-request-journal` is a kept alias. |
 
 ### Sandbox
 
@@ -140,7 +147,7 @@ Everything else is the mock-serving surface.
 
 ## Docker
 
-The image is `ghcr.io/omercelikdev/mockifyr`, built for `linux/amd64` and `linux/arm64`. It exposes
+The image is `ghcr.io/qorpe/mockifyr`, built for `linux/amd64` and `linux/arm64`. It exposes
 `8080` and its baked entrypoint is:
 
 ```bash
@@ -150,7 +157,7 @@ dotnet Mockifyr.Server.dll --port 8080 --dashboard /app/dashboard --root-dir /wo
 Extra flags appended to `docker run` are passed through to that entrypoint:
 
 ```bash
-docker run -p 8080:8080 ghcr.io/omercelikdev/mockifyr --global-response-templating
+docker run -p 8080:8080 ghcr.io/qorpe/mockifyr --global-response-templating
 ```
 
 To run engine-only with no dashboard, override the entrypoint so that `--dashboard` is dropped.
