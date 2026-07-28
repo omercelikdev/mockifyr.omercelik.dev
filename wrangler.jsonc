@@ -1,0 +1,6 @@
+// Workers Builds config: static Astro site served as Worker assets.
+{
+  "name": "mockifyr",
+  "compatibility_date": "2025-01-01",
+  "assets": { "directory": "./dist" }
+}
