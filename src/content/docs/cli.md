@@ -50,6 +50,21 @@ See [HTTPS, HTTP/2 and mTLS](/https-and-mtls/).
 | `--sms-profile twilio` | unset | Mounts Twilio's send-message endpoint on the mock surface — the official SDK works unchanged; every send is captured. A stub on the same URL still wins. |
 | `--message-limit <n>` | `1000` | Per-tenant inbox bound; the oldest message is evicted first. |
 
+### Security hardening
+
+| Flag | Default | Effect |
+|------|---------|--------|
+| `--mask-headers <names>` | none | Comma-separated header names whose values are replaced with `***` **before the serve event is stored** — they never reach the journal, the dashboard, or an export. Case-insensitive. |
+| `--mask-body-fields <names>` | none | Comma-separated JSON field names masked the same way, at any depth and inside arrays. A body that is not JSON is stored byte-for-byte. |
+| `--tenant-credential <tenant>:<user>:<pass>` | none | Repeatable. An admin credential scoped to one tenant: naming another in `X-Mockifyr-Tenant` answers **403 `Admin.TenantForbidden`**. `--admin-user` stays the system scope that reaches every tenant. |
+| `--block-outbound-routes` | off | While the admin API is unauthenticated, refuse `POST`/`PUT`/`DELETE` on `/__admin/recordings`, `/__admin/outbound-trust` and `/__admin/git` with **403 `Admin.OutboundRoutesBlocked`**, so an open host cannot be used as a forward proxy. Inert once credentials are set. |
+
+:::caution
+Masking is opt-in because the journal also backs [verify](/admin-api/#request-journal) and near-miss
+diagnostics: a masked `Authorization` header is invisible to a verification that asserts on it. Mask
+what must never be retained, not everything.
+:::
+
 ### Request journal
 
 | Flag | Default | Effect |
