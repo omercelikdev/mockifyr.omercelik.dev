@@ -19,6 +19,19 @@ read-only and exposes only name, version, persistence, and tenant count; every o
 route stays guarded.
 :::
 
+Three flags cover the hardening this page's guidance implies — see the
+[CLI reference](/cli/#security-hardening) for the full table:
+
+- **`--tenant-credential <tenant>:<user>:<pass>`** — per-tenant admin credentials. Without it the
+  tenant header is a claim any admin caller can rewrite; with it, a principal scoped to one tenant
+  gets **403** when it names another. `--admin-user` remains the system scope.
+- **`--mask-headers` / `--mask-body-fields`** — keep credentials and sensitive fields out of the
+  request journal entirely.
+- **`--block-outbound-routes`** — on an unauthenticated host, refuse the routes that make outbound
+  calls or change outbound trust.
+
+An unauthenticated host also prints a startup line naming what is reachable.
+
 ## Enable it
 
 Two settings, always given together — `admin-user` and `admin-pass`. If only one is set, auth stays
