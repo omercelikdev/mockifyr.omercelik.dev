@@ -74,6 +74,19 @@ what must never be retained, not everything.
 | `--journal-limit <n>` | `1000` | Per-tenant request-journal bound; the oldest entry is evicted first. `<=0` means unbounded. `--max-request-journal-entries` is a kept alias. |
 | `--journal-disabled` | off | Record nothing in the request journal — for load tests where the journal is pure overhead. `--no-request-journal` is a kept alias. |
 
+### Operations
+
+Covered end to end in [deploying in production](/deploying-in-production/).
+
+| Flag | Default | Effect |
+|------|---------|--------|
+| `--metrics` | off | Expose Prometheus metrics at `/__admin/metrics`, on the existing port and outside admin auth — a scraper cannot carry credentials. |
+| `--otel-endpoint <url>` | unset | Export traces and metrics over OTLP, e.g. `http://otel-collector:4317`. |
+| `--log-json` | off | Structured JSON logs for a log pipeline or SIEM. |
+| `--audit` | off | Record every administrative change at `/__admin/audit` — principal, tenant, action, target, outcome — and emit each as an `admin.audit` log line. Reads and unauthenticated attempts are not recorded. |
+| `--audit-limit <n>` | `1000` | Per-tenant audit-trail bound; the oldest entry is evicted first. `<=0` means unbounded. |
+| `--healthcheck` | — | One-shot probe mode: checks the host and exits `0` or `1`, then stops. Used by the image's `HEALTHCHECK` so no `curl` is needed. |
+
 ### Sandbox
 
 | Flag | Default | Effect |

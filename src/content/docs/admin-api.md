@@ -28,7 +28,9 @@ Authentication — HTTP Basic, off by default — is covered in
 
 | Method | Path | Purpose | Response |
 |--------|------|---------|----------|
-| `GET` | `/__admin/health` | Liveness and a snapshot of the instance | `{name, version, persistence, tenants, totalStubs}` |
+| `GET` | `/__admin/health` | Liveness and a snapshot of the instance | `{name, version, persistence, tenants, totalStubs, cryptography, audit}` |
+| `GET` | `/__admin/live` | Is the process alive (never fails while running) | `{status:"alive"}` |
+| `GET` | `/__admin/ready` | Should traffic be routed here | `{status}` — **503** while starting or draining |
 | `GET` | `/__admin/tenants` | Tenants currently holding stubs | `{tenants:[…]}` |
 
 ```json
@@ -41,7 +43,13 @@ Authentication — HTTP Basic, off by default — is covered in
 }
 ```
 
-`persistence` is the provider name of the configured store.
+`persistence` is the provider name of the configured store. `cryptography` reports which of the four
+payload-crypto capabilities the host holds keys for, and `audit` whether it is recording an
+[audit trail](#audit-trail).
+
+All three endpoints stay **outside admin auth** — a Kubernetes probe or a Prometheus scraper cannot
+carry credentials, and a 401 on liveness would send the pod into a restart loop. See
+[deploying in production](/deploying-in-production/).
 
 :::caution
 The `version` field is hard-coded `"1.0"` and does **not** track the release version. Do not use it for
@@ -243,6 +251,39 @@ are unlimited and carry no rate headers. Keys survive restarts on every
 | `ApiKey.NotFound` | 404 |
 | `ApiKey.InvalidName` · `ApiKey.InvalidQuota` | 422 |
 
+
+## Audit trail
+
+Available when the host runs with `--audit`. Read-only: entries are written by the host as a side
+effect of the change they describe, so nothing on this API can rewrite history.
+
+| Method | Path | Purpose | Response |
+|--------|------|---------|----------|
+| `GET` | `/__admin/audit` | The tenant's administrative changes, newest first | `{entries:[…]}` |
+
+`?limit=<n>` caps the result (clamped to 1–1000, default 200). Entries are tenant-scoped like every
+other route here.
+
+```json
+{
+  "entries": [
+    {
+      "id": "62a8a64f-4f86-4d36-a30b-0f1e373a8753",
+      "timestamp": "2026-07-30T13:25:14.32Z",
+      "principal": "tenant:acme",
+      "tenant": "acme",
+      "action": "DELETE /__admin/mappings/5a5bb853-…",
+      "target": "5a5bb853-…",
+      "outcome": 200
+    }
+  ]
+}
+```
+
+`principal` is a label — `system`, `tenant:<name>` or `anonymous` — never credential material.
+`outcome` is the status the operation actually answered with, so a refused change is recorded as
+refused. Reads and unauthenticated attempts are not recorded; see
+[deploying in production](/deploying-in-production/#the-audit-trail) for the full rules.
 
 ## Recordings
 
