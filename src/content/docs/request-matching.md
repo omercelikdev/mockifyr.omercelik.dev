@@ -180,3 +180,42 @@ traffic.
 
 Because the open-source oracle refuses these itself, there is no reference behaviour to differentially
 test against. See [limitations](/limitations/) for the full list of deferred edges.
+
+## Encrypted payloads
+
+Some upstreams protect the payload on top of TLS: the envelope stays readable, but named fields carry
+ciphertext. Matching such a body is impossible directly — a correct client uses a fresh IV per
+request, so the bytes differ every time.
+
+A stub can declare which fields to decrypt first. Start the host with a 256-bit key
+([`--decrypt-key`](/cli/#security-hardening)) and add a `decrypt` block to the request:
+
+```json
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/pay",
+    "decrypt": { "scheme": "jwe-dir-a256gcm", "fields": ["encData"] },
+    "bodyPatterns": [{ "matchesJsonPath": { "expression": "$.encData.currency", "equalTo": "SAR" } }]
+  },
+  "response": {
+    "status": 201,
+    "transformers": ["response-template"],
+    "body": "pan={{jsonPath request.body '$.encData.pan'}}"
+  }
+}
+```
+
+The named fields are decrypted **before** body matchers run, and response templating sees the same
+decrypted view — so a matcher can assert on what the client encrypted, and a template can echo it.
+
+`scheme` is `jwe-dir-a256gcm`: JWE compact serialization with direct key agreement and A256GCM
+(RFC 7516 §5.1). Wrapped-key JWE (`alg` other than `dir`) is refused rather than half-supported.
+
+:::note
+Decryption is a **view**, not a rewrite. The [request journal](/admin-api/#request-journal) keeps
+exactly what the client sent — the ciphertext — so recordings and exports stay faithful.
+
+A payload that does not decrypt (wrong key, tampered tag, malformed token) is a **non-match**, never
+an error. Without `--decrypt-key`, a stub declaring `decrypt` simply never matches.
+:::
