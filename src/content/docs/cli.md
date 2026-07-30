@@ -54,7 +54,8 @@ See [HTTPS, HTTP/2 and mTLS](/https-and-mtls/).
 
 | Flag | Default | Effect |
 |------|---------|--------|
-| `--decrypt-key <base64>` | none | A 256-bit key (base64 or base64url) enabling **field-level payload decryption**: a stub declaring `decrypt` matches and templates against the decrypted values. See [request matching](/request-matching/#encrypted-payloads). |
+| `--decrypt-key <base64>` | none | A 256-bit key (base64 or base64url) enabling **payload cryptography** — decrypting request fields or whole bodies, and protecting responses: a stub declaring `decrypt` matches and templates against the decrypted values. See [request matching](/request-matching/#encrypted-payloads). |
+| `--sign-key <base64>` | none | A 256-bit secret enabling **signing**: a stub's `signature` block requires a validly signed request, and its `sign` block adds `Digest` + signature headers to the response. See [request matching](/request-matching/#signed-requests). |
 | `--mask-headers <names>` | none | Comma-separated header names whose values are replaced with `***` **before the serve event is stored** — they never reach the journal, the dashboard, or an export. Case-insensitive. |
 | `--mask-body-fields <names>` | none | Comma-separated JSON field names masked the same way, at any depth and inside arrays. A body that is not JSON is stored byte-for-byte. |
 | `--tenant-credential <tenant>:<user>:<pass>` | none | Repeatable. An admin credential scoped to one tenant: naming another in `X-Mockifyr-Tenant` answers **403 `Admin.TenantForbidden`**. `--admin-user` stays the system scope that reaches every tenant. |

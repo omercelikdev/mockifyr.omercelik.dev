@@ -123,6 +123,33 @@ These also live on `response` and each has its own page.
 A response is gzipped when the request carries `Accept-Encoding: gzip`, regardless of the response
 content type. There is no per-content-type exclusion list.
 
+## Protected responses
+
+A response can be encrypted before it goes on the wire, so a client that decrypts what it receives
+accepts the mock. Same key as request decryption ([`--decrypt-key`](/cli/#security-hardening)):
+
+```json
+"response": {
+  "status": 201,
+  "transformers": ["response-template"],
+  "protect": { "scheme": "jwe-dir-a256gcm", "fields": ["encData"] },
+  "body": "{\"status\":\"approved\",\"encData\":{\"ref\":\"{{jsonPath request.body '$.ref'}}\"}}"
+}
+```
+
+Named fields are encrypted individually and the envelope stays readable — what gateways, routing and
+log pipelines need. **Leave `fields` out** and the whole body becomes one token.
+
+Protection runs **after** templating and every transformer, so what gets encrypted is exactly what
+would otherwise have been served. Signing (`sign`) runs after protection, so a signature covers the
+encrypted bytes.
+
+:::note
+If field-level protection is declared on a body that has no such fields, the response is served **as
+rendered** rather than silently switching to whole-body protection — the plaintext is visible
+immediately, so the misconfiguration is obvious instead of looking like it worked.
+:::
+
 ## Output shape quirks
 
 Some rendered output is formatted in ways that look inconsistent on their own. These shapes are

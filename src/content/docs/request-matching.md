@@ -219,3 +219,48 @@ exactly what the client sent — the ciphertext — so recordings and exports st
 A payload that does not decrypt (wrong key, tampered tag, malformed token) is a **non-match**, never
 an error. Without `--decrypt-key`, a stub declaring `decrypt` simply never matches.
 :::
+
+### Whole-body encryption
+
+Leave `fields` out and the **entire** body is treated as one JWE token:
+
+```json
+"decrypt": { "scheme": "jwe-dir-a256gcm" }
+```
+
+Matchers and templating then address the decrypted document directly (`$.pan`, not
+`$.encData.pan`). This is the shape a fixed-partner integration uses, and the one a byte comparison
+can never match: a correct sender uses a fresh IV, so the ciphertext differs on every request.
+
+## Signed requests
+
+A stub can require that the request carry a valid signature — the PSD2 / Berlin Group shape, where a
+`Digest` header commits to the body and a signature header carries the HMAC of that digest:
+
+```json
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/payments",
+    "signature": { "scheme": "hmac-sha256" }
+  },
+  "response": { "status": 201, "sign": { "scheme": "hmac-sha256" }, "body": "{\"ok\":true}" }
+}
+```
+
+Start the host with a secret ([`--sign-key`](/cli/#security-hardening)). Header names default to
+`X-JWS-Signature` and `Digest`; override them with `header` and `digestHeader`.
+
+Verification checks **both** halves: the digest must describe the body actually received, and the
+signature must be the HMAC of that digest value. A request that fails either check simply **does not
+match** the stub — you get a 404, exactly as with any other mismatch.
+
+:::caution
+The check **fails closed**. Without `--sign-key`, a stub that declares `signature` can never match —
+a host that cannot verify a signature must not accept one.
+:::
+
+The `sign` block on the response adds the digest of the bytes actually served plus their signature,
+so a client that verifies what it receives is satisfied. It runs after
+[response protection](/responses/#protected-responses), so the digest covers the encrypted bytes the
+client will verify.
