@@ -252,6 +252,35 @@ are unlimited and carry no rate headers. Keys survive restarts on every
 | `ApiKey.InvalidName` · `ApiKey.InvalidQuota` | 422 |
 
 
+## Backup and restore
+
+| Method | Path | Purpose | Response |
+|--------|------|---------|----------|
+| `GET` | `/__admin/backup` | One archive of everything the tenant's operator authored | the archive, as a download |
+| `POST` | `/__admin/restore` | Restores an archive into the tenant | `{restored:{mappings, environments, resources, apiKeys, scenarios}}` |
+
+```bash
+curl -s http://localhost:8080/__admin/backup > backup.json
+curl -s -X POST http://localhost:8080/__admin/restore --data-binary @backup.json
+```
+
+The archive carries stubs (as authored), environment keys, sandbox documents, API keys and scenario
+states. The request journal and message inbox are **not** in it — they record what happened, not what
+you configured.
+
+A restore **replaces** what the archive covers: stubs, environments, sandbox documents and API keys
+that are not in the archive are removed, so a restored host is the host that was backed up rather
+than a union with whatever was there. The destination is the tenant in your `X-Mockifyr-Tenant`
+header, not the name inside the file, so restoring one tenant's archive into another is a normal
+drill. Anything that is not a Mockifyr archive is refused with **422 `Backup.Invalid`** and changes
+nothing.
+
+:::caution
+The archive contains API key **verifiers**, so consumers' keys keep working after a restore. That
+makes the file a secret — store it like a key file. The key tokens themselves were never stored and
+cannot appear in it.
+:::
+
 ## Audit trail
 
 Available when the host runs with `--audit`. Read-only: entries are written by the host as a side

@@ -81,6 +81,34 @@ Serving metrics are labelled by `tenant`, `matched` and `method`. Stub id and UR
 **not** labels: a mock host can hold thousands of stubs, and a metrics backend that receives one time
 series per stub will fall over.
 
+## Backup and restore
+
+```bash
+curl -s http://mockifyr:8080/__admin/backup > backup-$(date +%F).json
+```
+
+One archive per tenant, covering everything an operator authored: stubs, environment keys, sandbox
+documents, API keys and scenario states. Settings → **Backup and restore** does the same from the
+dashboard. Full request and response shapes are in the [admin API reference](/admin-api/#backup-and-restore).
+
+A runbook that works:
+
+1. **Before an upgrade**, take an archive per tenant and store it where your secrets live — it carries
+   API key verifiers, which is what lets consumers keep using the keys they already hold.
+2. **To restore**, bring up a host on the target version and `POST` each archive to
+   `/__admin/restore` with that tenant's `X-Mockifyr-Tenant` header.
+3. **Verify** by calling one stub per tenant and checking that an environment-templated response
+   resolves — that proves the environment section landed, not just the stubs.
+
+A restore **replaces** what the archive covers rather than merging, so a restored host is the host
+that was backed up. Restoring is refused outright if the file is not a Mockifyr archive, so pointing
+it at a stub bundle by mistake changes nothing.
+
+Deliberately not in the archive: the request journal, the message inbox and quota counters. They are
+observations of what happened, not configuration — restoring them would fabricate a history the new
+host never served. Host configuration (outbound trust, TLS, flags) is not there either; that lives
+with your Helm values.
+
 ## The audit trail
 
 The request journal records what the host **served**. `--audit` records what was **changed**:
