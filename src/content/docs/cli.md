@@ -56,6 +56,10 @@ See [HTTPS, HTTP/2 and mTLS](/https-and-mtls/).
 |------|---------|--------|
 | `--decrypt-key <base64>` | none | A 256-bit key (base64 or base64url) enabling **payload cryptography** — decrypting request fields or whole bodies, and protecting responses: a stub declaring `decrypt` matches and templates against the decrypted values. See [request matching](/request-matching/#encrypted-payloads). |
 | `--sign-key <base64>` | none | A 256-bit secret enabling **signing**: a stub's `signature` block requires a validly signed request, and its `sign` block adds `Digest` + signature headers to the response. See [request matching](/request-matching/#signed-requests). |
+| `--decrypt-key-file <path>` | none | Read decryption keys from a file instead of the command line. The file holds one key per line, newest first, optionally `id: base64`. Re-read on change — see [key rotation](/deploying-in-production/#key-rotation). |
+| `--sign-key-file <path>` | none | The same, for signing secrets. |
+| `--key-reload-seconds <n>` | `10` | How often a key file is re-read. |
+| `--admin-pass-file <path>` | none | Read the admin password from a file, keeping it out of the process listing. Read at startup; the inline `--admin-pass` wins if both are given. |
 | `--mask-headers <names>` | none | Comma-separated header names whose values are replaced with `***` **before the serve event is stored** — they never reach the journal, the dashboard, or an export. Case-insensitive. |
 | `--mask-body-fields <names>` | none | Comma-separated JSON field names masked the same way, at any depth and inside arrays. A body that is not JSON is stored byte-for-byte. |
 | `--tenant-credential <tenant>:<user>:<pass>` | none | Repeatable. An admin credential scoped to one tenant: naming another in `X-Mockifyr-Tenant` answers **403 `Admin.TenantForbidden`**. `--admin-user` stays the system scope that reaches every tenant. |

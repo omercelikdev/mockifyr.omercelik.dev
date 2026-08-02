@@ -81,6 +81,63 @@ Serving metrics are labelled by `tenant`, `matched` and `method`. Stub id and UR
 **not** labels: a mock host can hold thousands of stubs, and a metrics backend that receives one time
 series per stub will fall over.
 
+## Key rotation
+
+Cryptographic keys and the admin password can come from files rather than the command line, which
+keeps them out of the process listing — and, for keys, makes rotation something you do without
+restarting anything.
+
+```bash
+mockifyr --decrypt-key-file /keys/decrypt --sign-key-file /keys/sign --admin-pass-file /keys/admin
+```
+
+A key file holds a **ring**: one key per line, newest first, optionally with an id.
+
+```
+# /keys/decrypt
+partner-2026-08: TmV3IGtleSBtYXRlcmlhbCBnb2VzIGhlcmUgLi4uLi4uLi4=
+partner-2026-02: T2xkIGtleSwgc3RpbGwgYWNjZXB0ZWQgd2hpbGUgd2UgZHI=
+```
+
+**New payloads are produced with the newest key; every key in the file is still accepted.** That is
+what makes a rollover safe:
+
+1. **Add** the new key as the first line. Partners that have already switched work immediately.
+2. **Drain** — leave the old key in place while partners migrate. Both work, at the same time.
+3. **Remove** the old line. Removing it is what actually retires the key; until then it keeps working.
+
+No step restarts the host. The file is re-read when it changes (`--key-reload-seconds`, default 10),
+and `/__admin/health` reports how many keys are active per capability, so you can confirm a rollover
+landed instead of assuming it:
+
+```json
+{ "cryptography": { "payloadDecryption": true, "decryptKeys": 2, "signKeys": 1 } }
+```
+
+It reports counts, never key material.
+
+:::note
+Comment a line out with `#` to withdraw a key temporarily — a commented key is not active. A line
+that is not a valid 256-bit key is skipped rather than failing the file, so a typo during a rollover
+cannot stop the host from starting; the active-key count is how you notice.
+:::
+
+### In Kubernetes
+
+```bash
+helm install mockifyr ./deploy/helm/mockifyr \
+  --set cryptography.existingSecret=mockifyr-keys \
+  --set cryptography.mountAsFiles=true
+```
+
+The Secret is mounted read-only at `/keys` and no key appears in the pod's arguments or environment.
+Updating the Secret rewrites the mounted file and the host picks it up on its next poll — which is
+why the file source polls the modification time rather than watching for filesystem events, since
+Kubernetes updates a mounted Secret by swapping a symlink.
+
+A key file that is briefly unreadable or half-written leaves the last good keys in place, so a
+rotation script that truncates before writing cannot disarm a running host.
+
 ## Backup and restore
 
 ```bash
