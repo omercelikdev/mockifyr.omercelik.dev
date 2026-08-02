@@ -75,6 +75,7 @@ export default defineConfig({
             { label: 'Persistence', slug: 'persistence' },
             { label: 'HTTPS, HTTP/2 and mTLS', slug: 'https-and-mtls' },
             { label: 'Deploying in production', slug: 'deploying-in-production' },
+            { label: 'Performance and sizing', slug: 'performance' },
           ],
         },
         {
