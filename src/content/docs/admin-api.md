@@ -51,9 +51,9 @@ All three endpoints stay **outside admin auth** — a Kubernetes probe or a Prom
 carry credentials, and a 401 on liveness would send the pod into a restart loop. See
 [deploying in production](/deploying-in-production/).
 
-:::caution
-The `version` field is hard-coded `"1.0"` and does **not** track the release version. Do not use it for
-version detection.
+:::note
+`version` is the running build's version (e.g. `0.24.0`). It was a hard-coded `"1.0"` before 0.25.0,
+so treat it as unreliable on older hosts.
 :::
 
 ## Mappings
