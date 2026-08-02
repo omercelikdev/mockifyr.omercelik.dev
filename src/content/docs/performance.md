@@ -13,12 +13,12 @@ Release build, against a store of **1000 stubs**.
 
 | Case | Mean | Allocated |
 |------|-----:|----------:|
-| Static stub, matched by method and path | **378 ns** | 1.14 KB |
-| The same, with the request journal on | 491 ns | 1.14 KB |
-| Structural `equalToJson` body matching | 686 ns | 1.80 KB |
-| Templated response | 1.21 µs | 4.55 KB |
-| Matching the **last** of 1000 stubs | 29.1 µs | 94.8 KB |
-| 256 KiB templated response body | 262 µs | 2.49 MB |
+| Static stub, matched by method and path | **385 ns** | 1.32 KB |
+| Matching the **last** of 1000 stubs | **392 ns** | 1.33 KB |
+| With the request journal on | 520 ns | 1.32 KB |
+| Structural `equalToJson` body matching | 678 ns | 1.98 KB |
+| Templated response | 1.15 µs | 4.73 KB |
+| 256 KiB templated response body | 274 µs | 2.49 MB |
 
 What these mean in practice:
 
@@ -28,9 +28,11 @@ What these mean in practice:
   off with `--journal-disabled` in a load test; rarely worth it otherwise.
 - **Templating costs about 800 ns over a static match.** Compiled templates are cached, so a templated
   stub is roughly 3× a static one — not a reason to avoid templating.
-- **Matching scales with stub count.** The 29 µs figure is the worst case: the request matches the
-  *last* of 1000 stubs, so all 1000 are evaluated. A request that hits an early stub is back at the
-  baseline. Keep stub sets scoped per tenant rather than piling every team's stubs into one.
+- **Matching does not scale with stub count.** Finding the last of 1000 stubs costs the same as
+  matching a single one, because stubs are indexed by method and path. The exception is stubs whose
+  URL is a **pattern** rather than a literal path — a regex, a URI template, or a full URL with a
+  query string. Those are evaluated on every request, so a stub set that is mostly patterns behaves
+  like a linear scan.
 - **Large bodies cost roughly 10× their size in allocations.** For multi-megabyte payloads, prefer
   proxying to a real service over serving them from a stub.
 
