@@ -9,14 +9,19 @@ is loaded into both, the same request is driven through both, and the responses 
 lists what that testing has deliberately left out or deferred — so you find it here rather than the hard
 way.
 
+Where a gap could otherwise be discovered from behaviour, the engine now says so at import time: a
+mapping using an unimplemented field is still accepted, and the response carries a `warnings` array
+explaining what will happen instead. See [the admin API](/admin-api/#import-warnings).
+
 ## Response bodies
 
 `bodyFileName` — a response body loaded from a `__files/` directory — is **not implemented**. The stub
 still matches, but the response body is empty.
 
-:::caution
-This fails quietly. A stub with `bodyFileName` returns its configured status with **no body**, which
-looks like a matching problem but isn't. Inline the body instead.
+:::note
+Since 1.0 this is **reported, not silent**: importing such a stub returns a `warnings` array (and
+prints a line when mappings are loaded from disk). The stub is still created and still returns its
+configured status with **no body** — inline the body with `body` or `jsonBody` instead.
 :::
 
 See [responses](/responses/).
@@ -62,8 +67,9 @@ See [templating](/templating/) and the [template helper reference](/template-hel
 
 ## Delays and faults
 
-Only the `uniform` delay distribution is parsed — **anything else is silently ignored**, with no error
-and no delay. Lognormal and `chunkedDribbleDelay` are not implemented.
+Only the `uniform` delay distribution is parsed. Anything else means **no delay at all** — reported
+as an import warning since 1.0, rather than silently ignored as it was before. Lognormal and
+`chunkedDribbleDelay` are not implemented.
 
 Byte-level fault fidelity is not reproduced: all four faults surface to a client identically, as a
 failed request. See [delays and faults](/delays-and-faults/).
