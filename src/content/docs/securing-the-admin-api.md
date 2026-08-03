@@ -100,3 +100,62 @@ credentials locally and attaches Basic auth to its admin calls. (Mockifyr delibe
 - A command-line password is visible in `ps`; prefer env vars in production.
 - Put Mockifyr behind TLS (`--https-port`) or a TLS-terminating proxy so Basic credentials aren't sent
   in the clear.
+
+
+## Single sign-on (OIDC)
+
+Authenticate people through your identity provider instead of a shared password:
+
+```bash
+mockifyr --oidc-authority https://login.example.com \
+         --oidc-audience mockifyr \
+         --oidc-client-id mockifyr-dashboard
+```
+
+The dashboard then shows **Sign in with your identity provider** instead of a username and password,
+using authorization code + PKCE. Register the dashboard's URL as a redirect URI on a **public** client
+— there is no client secret, because anything shipped to a browser is readable.
+
+API callers send the access token as `Authorization: Bearer <token>`.
+
+### Scoping an identity to a tenant
+
+```bash
+--oidc-tenant-claim mockifyr_tenant
+```
+
+The named claim decides which tenant that identity may address — the same rule
+[`--tenant-credential`](#per-tenant-credentials) enforces, applied to a claim instead of a password. A
+principal scoped to `acme` gets **403** when it names `globex`, and omitting the tenant header does not
+help: that addresses the default tenant, which it also does not own.
+
+An identity **without** the claim keeps system scope and reaches every tenant — the OIDC equivalent of
+`--admin-user`, so an operator's own account still works while individual teams are scoped.
+
+### Requiring a role
+
+```bash
+--oidc-required-role mockifyr-admin        # --oidc-role-claim defaults to `roles`
+```
+
+Tokens without the role are refused, so a directory-wide sign-in is not automatically admin access
+here.
+
+### Notes
+
+- **Basic credentials keep working alongside OIDC.** Run SSO for people and `--admin-user` for CI —
+  adopting it does not have to be a flag day.
+- **Signing keys come from the provider's discovery document**, so key rotation needs no restart and
+  nothing is pinned in configuration.
+- **Everything that is not a valid token is a 401**, including an unreachable provider — a provider
+  outage must not turn every admin call into a 500.
+- **The [audit trail](/admin-api/#audit-trail) records the person** (`oidc:jane@example.com`), never
+  the token.
+- **`/__admin/health` reports the auth mode** and the public client parameters, unauthenticated by
+  necessity — a login screen cannot authenticate before it knows where to send the user.
+- Probes stay open, as always: a kubelet cannot carry a token.
+
+:::note
+Not yet supported: token refresh (an expired session returns you to sign-in), back-channel logout, and
+mapping claims to anything finer than a tenant.
+:::
