@@ -12,7 +12,7 @@ whether you run in-memory or against PostgreSQL.
 | Provider | Selected by | Storage shape |
 |----------|-------------|---------------|
 | None (in-memory) | default | Nothing survives a restart |
-| File | `--root-dir <dir>` | One id-stamped `<id>.json` per stub under `<dir>/mappings`; environments under `<dir>/environments/<tenant>/` |
+| File | `--root-dir <dir>` | One id-stamped `<id>.json` per stub under `<dir>/mappings`; environments under `<dir>/environments/<tenant>/`; sandbox resources under `<dir>/resources/<tenant>/<collection>/` |
 | LiteDB | `--litedb <path>` | One document `{Id, Tenant, Json}` in an embedded single-file database |
 | PostgreSQL | `--postgres <connstr>` | Row `(id uuid, tenant text, json text)`, upserted; the table is created if absent |
 | Redis | `--redis <connstr>` | Hash `mockifyr:stubs:{tenant}` keyed by stub id |
@@ -27,6 +27,27 @@ If a datastore flag is passed at run time it **takes precedence over the file st
 
 Stub ids are stamped into the stored JSON, so a stub keeps the same id across a restart on every
 backend. Anything holding a stub id — a test, a script, a dashboard bookmark — keeps working.
+
+## What persists
+
+Choosing a provider makes all of this durable, not just stubs:
+
+| | Survives a restart |
+|---|---|
+| Stubs | yes |
+| Environment keys | yes |
+| [Sandbox resources](/admin-api/#sandbox-resources) | yes |
+| [Sandbox API keys](/admin-api/#sandbox-api-keys) | yes |
+| Scenario states | no — reset to `Started` |
+| Request journal, message inbox | no — they record what happened, not what you configured |
+
+Deletes and resets persist too: a document you delete stays deleted after a restart, and a collection
+you reset stays empty. A partner's seeded fixtures are still there on the next deploy.
+
+:::note
+Without a provider nothing is written to disk — an in-memory host behaves exactly as it always has.
+Durability follows the persistence choice; it is not a new default.
+:::
 
 ## What `--root-dir` gives you beyond mappings
 
