@@ -173,9 +173,9 @@ active, and lets you switch the active value.
 - **Values are plaintext.** There is no secret type — a value is readable through `GET
   /__admin/environments` and visible in the dashboard. Do not put credentials in a key and expect them
   to be hidden.
-- **The change feed does not cover environments.** On a multi-instance host with
-  [`--change-feed`](/persistence/), stub changes propagate but environment key changes do not; other
-  instances pick them up only after a restart.
+- **Multi-instance propagation is asynchronous.** With [`--change-feed`](/persistence/) a key change
+  reaches the other instances within moments, not atomically — a request in flight on another instance
+  may still resolve the previous value.
 
 ## Related
 
