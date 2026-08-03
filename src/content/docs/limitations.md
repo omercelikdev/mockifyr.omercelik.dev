@@ -49,8 +49,16 @@ See [request matching](/request-matching/).
 
 ## Templating
 
-There is no `add`, `subtract`, `multiply`, `divide`, `round`, `abs` or `soapXPath` helper. Arithmetic is
-the single `math` helper, and it supports only `+ - * /`.
+Arithmetic is the single `math` helper, supporting `+ - * / %`. There is no `soapXPath` helper.
+
+:::note
+`add`, `subtract`, `multiply`, `divide`, `round` and `abs` were listed here as gaps. They are not —
+the reference engine rejects them too, so implementing them would diverge from it rather than match
+it. Use `{{math 2 '+' 3}}`. Verified by driving each one through both engines.
+:::
+
+Integer division rounds half **away from zero** (`{{math -9 '/' 2}}` is `-5`), matching the reference
+engine. Division or modulo by zero renders an empty value where the reference engine returns 500.
 
 | Helper area | Limitation |
 |-------------|------------|
@@ -79,7 +87,8 @@ See [proxying](/proxying/).
 
 ## Record and playback
 
-The recording session is **global rather than tenant-scoped**. Also not implemented:
+Recording is tenant-scoped: two tenants can record at once against their own upstreams, and one
+tenant's session neither discards another's captures nor proxies their traffic. Not implemented:
 
 | Feature | Status |
 |---------|--------|
