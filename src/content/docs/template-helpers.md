@@ -98,7 +98,7 @@ This matches the reference engine, so the two produce identical output; it is no
 
 | Helper | Purpose |
 |--------|---------|
-| `math` | Arithmetic; supports `+ - * /` only |
+| `math` | Arithmetic: `{{math 7 '%' 2}}`. Supports `+ - * / %`. Integer division rounds half away from zero, so `{{math -9 '/' 2}}` is `-5` |
 | `numberFormat` | Format a number |
 | `size` | Length of a string or collection |
 | `join` | Join a collection with a separator |
@@ -182,7 +182,9 @@ claim values are not supported.
 ## Helpers that do not exist
 
 Several helper names appear in third-party references and even in the dashboard's helper popup, but
-are not registered in the engine. The engine is the authority.
+are not registered in the engine. The engine is the authority — and neither is the reference engine
+Mockifyr is tested against, which rejects each of these too. Reaching for `math` is not a workaround;
+it is the supported spelling on both sides.
 
 | Name | Use instead |
 |------|-------------|
