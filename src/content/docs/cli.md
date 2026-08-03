@@ -109,6 +109,18 @@ Covered end to end in [deploying in production](/deploying-in-production/).
 Both must be given together. If only one is set, auth stays off — see
 [securing the admin API](/securing-the-admin-api/).
 
+| Flag | Default | Effect |
+|------|---------|--------|
+| `--oidc-authority <url>` | unset | Authenticate the admin API with OIDC bearer tokens. Signing keys are read from the issuer's discovery document, so provider key rotation needs no restart. See [single sign-on](/securing-the-admin-api/#single-sign-on-oidc). |
+| `--oidc-audience <aud>` | unset | The audience a token must carry. Unset accepts any, which is rarely what you want when the directory issues tokens for several applications. |
+| `--oidc-client-id <id>` | unset | The **public** client the dashboard signs in with (authorization code + PKCE, no secret). |
+| `--oidc-tenant-claim <claim>` | unset | The claim naming the tenant an identity may address; a scoped principal gets **403** on another tenant. No claim means system scope. |
+| `--oidc-required-role <role>` | unset | Refuse tokens that do not carry this role. |
+| `--oidc-role-claim <claim>` | `roles` | Which claim carries roles. |
+
+OIDC and `--admin-user` can both be configured: people sign in through the provider, machines keep a
+credential.
+
 ### Persistence
 
 | Flag | Default | Effect |
