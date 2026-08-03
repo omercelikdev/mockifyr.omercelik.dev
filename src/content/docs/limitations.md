@@ -115,8 +115,6 @@ To diagnose a request that didn't match, use `GET /__admin/requests?unmatched=tr
 - Reload from a plain mappings directory covers only the **default tenant**, at startup.
 - The mapping format's per-stub `persistent: false` opt-out is not supported: with a root directory set, **every**
   admin mutation persists.
-- The change feed does not cover environments, so multi-instance hosts pick up
-  [environment](/environments/) changes only after a restart.
 - Environment values are plaintext — there is no secret type.
 
 See [persistence](/persistence/).

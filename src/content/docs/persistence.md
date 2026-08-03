@@ -71,7 +71,13 @@ The root dir is more than a stub folder. It is where the host looks for and writ
 | PostgreSQL | `LISTEN` / `NOTIFY` on `mockifyr_changes` |
 
 On a notification the instance reconciles **every tenant** — upsert, then prune — so an instance that
-missed a message still converges on the next one.
+missed a message still converges on the next one. Stubs, [environment](/environments/) keys and sandbox
+documents all travel on the feed: a key's active value changed on one instance is honoured by the others
+without a restart, and deletes propagate the same way.
+
+A sandbox document mirrored onto another instance keeps the version and timestamps the *writing* instance
+gave it, so the same document reads identically wherever you ask. An instance ignores its own
+announcements — it already holds what it just wrote.
 
 :::note
 `--change-feed` is only wired when `--postgres` or `--redis` is set. With the file or LiteDB backend
