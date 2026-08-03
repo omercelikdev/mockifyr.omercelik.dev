@@ -304,8 +304,8 @@ One line per kind of gap, with a count when several stubs share it (`(50 stubs)`
 stub names a different file produces one warning, not fifty. Mappings loaded from disk at startup print
 the same lines to the console.
 
-Covered today: `bodyFileName` and non-`uniform` `delayDistribution` — the two gaps listed in
-[known limitations](/limitations/) that were previously silent.
+Covered today: non-`uniform` `delayDistribution`. (`bodyFileName` was on this list until it was
+implemented — see [file-backed bodies](/responses/#file-backed-bodies).)
 
 ## Audit trail
 

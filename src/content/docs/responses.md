@@ -166,3 +166,44 @@ correct here.
 Do not treat these as bugs to normalize away. If you compare Mockifyr output against a response
 recorded from the reference engine byte for byte, matching these shapes is what makes the comparison pass.
 :::
+
+
+## File-backed bodies
+
+A response body can live in a file instead of the mapping. Start the host with a `--root-dir` and put
+the file under `__files`:
+
+```
+my-mocks/
+  mappings/orders.json
+  __files/order.json
+```
+
+```json
+{
+  "request": { "method": "GET", "urlPath": "/orders/A-1" },
+  "response": { "status": 200, "bodyFileName": "order.json" }
+}
+```
+
+Subdirectories work (`"bodyFileName": "orders/detail.json"`), and the file is read **per request** — so
+editing it changes the next response with no reload.
+
+Three behaviours worth knowing, each verified against the reference engine:
+
+- **Templating applies** when the response declares `"transformers": ["response-template"]`. The file's
+  content is templated exactly as an inline body would be.
+- **An inline `body` wins** if a stub somehow has both.
+- **A missing file is an error.** The response is **500** and names the file, rather than a 200 with an
+  empty body — which would look like a matching problem when it is a misconfigured deployment.
+
+:::note
+Without a `--root-dir` there is no file store, so a `bodyFileName` stub answers 500. The message names
+the file it wanted.
+:::
+
+:::caution
+File names are resolved **inside** `__files` only. A name that escapes the directory — `../secrets`,
+an absolute path — is refused and nothing is served. Stubs can be authored by anyone who can reach
+the admin API, so the name is treated as untrusted input.
+:::

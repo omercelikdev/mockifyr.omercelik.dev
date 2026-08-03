@@ -15,16 +15,11 @@ explaining what will happen instead. See [the admin API](/admin-api/#import-warn
 
 ## Response bodies
 
-`bodyFileName` — a response body loaded from a `__files/` directory — is **not implemented**. The stub
-still matches, but the response body is empty.
+`bodyFileName` is supported: a response body may live in a file under `<root-dir>/__files` instead of
+being inlined. See [responses](/responses/#file-backed-bodies).
 
-:::note
-Since 1.0 this is **reported, not silent**: importing such a stub returns a `warnings` array (and
-prints a line when mappings are loaded from disk). The stub is still created and still returns its
-configured status with **no body** — inline the body with `body` or `jsonBody` instead.
-:::
-
-See [responses](/responses/).
+Two edges remain: recording does not extract bodies into `__files`, and generated stubs always inline
+their bodies.
 
 ## Matching
 
