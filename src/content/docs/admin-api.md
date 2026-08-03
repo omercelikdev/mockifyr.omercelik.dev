@@ -281,6 +281,32 @@ makes the file a secret — store it like a key file. The key tokens themselves 
 cannot appear in it.
 :::
 
+## Import warnings
+
+Mockifyr implements a validated subset of the mapping dialect. When an imported mapping uses a field
+this engine accepts but does not act on, the stub is **still created** — refusing it would break
+importing a mapping set written for another engine — and the response tells you:
+
+```json
+{
+  "id": "8f3c…",
+  "uuid": "8f3c…",
+  "warnings": [
+    "'bodyFileName' is not implemented — such a stub matches and returns its status with an EMPTY body. Inline the body with 'body' or 'jsonBody' instead."
+  ]
+}
+```
+
+`POST /__admin/mappings/import` reports the same way. The field is **absent** when there is nothing to
+say, so an ordinary create is unchanged.
+
+One line per kind of gap, with a count when several stubs share it (`(50 stubs)`) — a bundle where every
+stub names a different file produces one warning, not fifty. Mappings loaded from disk at startup print
+the same lines to the console.
+
+Covered today: `bodyFileName` and non-`uniform` `delayDistribution` — the two gaps listed in
+[known limitations](/limitations/) that were previously silent.
+
 ## Audit trail
 
 Available when the host runs with `--audit`. Read-only: entries are written by the host as a side
