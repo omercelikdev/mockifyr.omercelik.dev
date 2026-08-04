@@ -107,7 +107,8 @@ curl -X POST   http://localhost:8080/__admin/scenarios/reset # back to Started
 ```
 
 Journal reset is a `DELETE` on the collection, not a `/reset` sibling — the one place the three do not
-rhyme, and the spelling the reference engine uses.
+rhyme, and the spelling the reference engine uses. The [dashboard](/the-dashboard/)'s Journal screen has
+a **Clear journal** button that does the same thing, for when you are debugging rather than scripting.
 
 In a suite that shares one host, clearing the journal in setup is what makes counts assertable — and
 [per-tenant](/multi-tenancy/) journals let parallel suites skip even that, since each tenant only ever
