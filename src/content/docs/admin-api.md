@@ -97,6 +97,7 @@ verification only see retained entries, matching the reference engine's journal-
 |--------|------|---------|----------|
 | `POST` | `/__admin/requests/count` | Count requests matching a pattern | `{count:n}` |
 | `GET` | `/__admin/requests` | List logged requests | `{requests:[…]}` |
+| `DELETE` | `/__admin/requests` | Discard the tenant's journal — counts and the listing start empty | `200` |
 | `GET` | `/__admin/requests/{id}` | Full detail for one request | see below |
 
 The body of `POST /__admin/requests/count` is a **request pattern** built from the same matchers as a

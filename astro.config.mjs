@@ -55,6 +55,7 @@ export default defineConfig({
             { label: 'Responses', slug: 'responses' },
             { label: 'Templating', slug: 'templating' },
             { label: 'Template helper reference', slug: 'template-helpers' },
+            { label: 'Verifying requests', slug: 'verifying-requests' },
           ],
         },
         {
@@ -65,6 +66,12 @@ export default defineConfig({
             { label: 'Proxying', slug: 'proxying' },
             { label: 'Record and playback', slug: 'record-and-playback' },
             { label: 'Webhooks', slug: 'webhooks' },
+          ],
+        },
+        {
+          label: 'Sandbox',
+          items: [
+            { label: 'The integration sandbox', slug: 'sandbox' },
           ],
         },
         {

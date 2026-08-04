@@ -1,0 +1,185 @@
+---
+title: The integration sandbox
+description: Give a partner a live, stateful API to build against — seeded data, real CRUD, their own key, and a quota — without standing up the real service.
+---
+
+A stub answers the same way every time. That is exactly what you want in a test and exactly what you
+do not want when somebody has to *build* against your API for two weeks.
+
+The sandbox is the other half: tenant-scoped JSON collections your stubs read and write, so a `POST`
+creates something a later `GET` returns. Add an API key and a quota and it becomes something you can
+hand to a partner integration team.
+
+Everything here is opt-in. A host that never touches it behaves exactly as before.
+
+## The pieces
+
+| | What it is |
+|---|---|
+| **Resources** | Tenant- and collection-scoped JSON documents — the data |
+| **The `state` directive** | What turns a matched stub into a CRUD operation on those documents |
+| **OpenAPI import** | A spec in, a working stateful sandbox out |
+| **API keys** | A credential the partner carries; it selects their tenant and carries their quota |
+
+## Seed some data
+
+Collections are created by writing to them — there is nothing to declare first.
+
+```bash
+curl -X POST http://localhost:8080/__admin/resources/orders/seed \
+  -H 'Content-Type: application/json' \
+  -d '[{"id":"ord-1","total":42},{"id":"ord-2","total":17}]'
+```
+
+Seeding is transactional: every item is validated before anything lands, so a bad element leaves the
+collection untouched. Elements may carry a string `id`; absent ones are generated.
+
+```bash
+curl http://localhost:8080/__admin/resources          # collections + counts
+curl http://localhost:8080/__admin/resources/orders   # {documents, total}
+```
+
+An unknown collection lists as an **empty page**, not a 404 — "no rows yet" is what a sandbox
+operator means. Full routes and error codes are in the [admin API reference](/admin-api/#sandbox-resources).
+
+## Make stubs read and write it
+
+A stub response declares a `state` directive and becomes a CRUD operation. The created document is
+addressable by the next request:
+
+```json
+{
+  "request": { "method": "POST", "urlPath": "/api/orders" },
+  "response": {
+    "status": 201,
+    "body": "{\"id\":\"{{state.id}}\",\"order\":{{state.body}} }",
+    "state": { "operation": "create", "collection": "orders" }
+  }
+}
+```
+
+```json
+{
+  "request": { "method": "GET", "urlPathPattern": "/api/orders/[^/]+" },
+  "response": {
+    "status": 200,
+    "body": "{{state.body}}",
+    "state": { "operation": "read", "collection": "orders", "id": "{{request.pathSegments.[2]}}" }
+  }
+}
+```
+
+`create`, `read`, `update`, `delete` and `list` are the operations; the result renders as
+`{{state.id}}`, `{{state.body}}`, `{{state.version}}`, `{{state.count}}` and `{{state.list}}`.
+Declaring the directive **is** the templating opt-in — no `response-template` transformer needed. The
+full syntax, including `missStatus`, lives with the [response directives](/responses/#stateful-responses-the-state-directive).
+
+What a stub writes, the admin API and the dashboard see immediately: it is one store, not a copy.
+
+## From a spec to a working sandbox
+
+If you already have an OpenAPI 3.x document, you do not have to author any of the above:
+
+```bash
+curl -X POST 'http://localhost:8080/__admin/openapi/import?stateful=true' \
+  -H 'Content-Type: application/yaml' \
+  --data-binary @petstore.yaml
+```
+
+- **Without `stateful`** — one stub per operation. Declared examples serve as-is; example-less
+  schemas get a synthesized sample, with `uuid`, `email` and `uri` formats backed by the
+  [random helpers](/template-helpers/) so values look alive rather than identical.
+- **With `stateful=true`** — resource-shaped path pairs (`/pets` plus `/pets/{id}`) additionally
+  become a wired CRUD set on a collection named after the path. Import, then `POST` a pet and `GET`
+  it back.
+
+JSON and YAML both work. Import is transactional, and imported stubs are ordinary mappings
+afterwards — listable, editable, exportable, indistinguishable from hand-written ones.
+
+Three refusals are worth knowing, because they are deliberate and typed rather than mysterious:
+external `$ref`s (URL **or** file) are refused before parsing with the offending pointer named — the
+host never fetches anything — a spec over 5 MiB is refused, and schema recursion deeper than 32
+levels (a cyclic `$ref`) is refused instead of hanging.
+
+The dashboard's **Add stub → OpenAPI** channel does the same thing with a file picker.
+
+## Hand it to a partner
+
+Start the host with `--sandbox-auth` and issue a key per consumer:
+
+```bash
+curl -X POST http://localhost:8080/__admin/apikeys \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"acme-integration","quotaPerHour":1000}'
+```
+
+```json
+{ "id": "…", "name": "acme-integration", "key": "mfk_…", "prefix": "mfk_a1b2c3d4", "quotaPerHour": 1000 }
+```
+
+**The token appears once.** Every later view carries only the 12-character display prefix — it is
+stored salted and hashed, so a leaked backup is not a leaked key, and neither is a screenshot of the
+Access screen.
+
+The partner sends it as `X-Api-Key` or `Authorization: Bearer`:
+
+```bash
+curl -H 'X-Api-Key: mfk_…' http://localhost:8080/api/orders
+```
+
+The key **selects the tenant**, ahead of the host/header rules — so a partner cannot reach another
+tenant's sandbox by changing a header, and does not need to know your tenancy scheme at all. An
+invalid or revoked key is an honest **401**, never a silent fall-through to somebody else's data.
+
+A key with a `quotaPerHour` is limited over a fixed hourly window. Counted responses carry
+`X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset`; going over gets a **429** with
+`Retry-After` — the behaviour a real gateway has, so the partner's retry logic gets exercised here
+instead of in production. `quotaPerHour: 0` (or absent) means unlimited, and unlimited keys emit no
+rate headers.
+
+Revoking is immediate:
+
+```bash
+curl -X DELETE http://localhost:8080/__admin/apikeys/{id}
+```
+
+:::caution
+A sandbox key is a **data-plane** credential. It never authenticates `/__admin/*` — the admin surface
+only accepts its own [admin authentication](/securing-the-admin-api/), on both carriers. Control
+plane and data plane never blur.
+:::
+
+## In the dashboard
+
+The **Sandbox** group has two screens: **Resources** browses collections and documents and lets you
+edit or reset them, and **Access** issues keys, shows each key's usage against its quota, and revokes
+them. A newly issued token is revealed once, with a copy button — after that the screen shows the
+prefix like everything else does.
+
+## Operating it
+
+**Durability.** Seeded documents survive a restart on every [persistence backend](/persistence/)
+(file system, LiteDB, PostgreSQL, Redis) — deletes and resets included. Issued keys persist the same
+way. A host with no persistence keeps everything in memory, which is usually what you want in CI.
+
+**Several replicas.** With `--change-feed`, documents written on one replica reach the others without
+a restart, keeping the version and timestamps the writing replica gave them.
+
+**Bounds.** A collection holds `--resource-limit` documents (default 1000, oldest evicted first when
+a *create* overflows — an update never evicts), and one document may be `--resource-max-body` bytes
+(default 1 MiB, an honest **413** beyond it). Bodies must be well-formed JSON (**422** otherwise) and
+are otherwise opaque: they round-trip byte for byte, unicode and all.
+
+**Tenancy.** Collections, documents and keys are all [tenant-scoped](/multi-tenancy/). The same
+collection name and the same document id in two tenants are two different documents.
+
+**Usage counters are in memory by design.** The credential persists across a restart; the hourly
+counter starts fresh. That is a deliberate trade — a quota is a fairness mechanism here, not billing.
+
+## Related
+
+- [Responses](/responses/#stateful-responses-the-state-directive) — the `state` directive in full.
+- [Admin API](/admin-api/#sandbox-resources) — every route, parameter and error code.
+- [Multi-tenancy](/multi-tenancy/) — how a tenant is chosen when there is no key.
+- [Persistence](/persistence/) — what survives a restart, and where it is stored.
+- [CLI](/cli/) — `--sandbox-auth`, `--resource-limit`, `--resource-max-body`.
