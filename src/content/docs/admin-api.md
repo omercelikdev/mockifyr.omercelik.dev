@@ -195,7 +195,9 @@ list entry is a summary:
 }
 ```
 
-`GET /__admin/requests/{id}` returns the full exchange, including any webhooks the stub fired:
+`GET /__admin/requests/{id}` returns the full exchange, including any webhooks the stub fired and any
+[broker messages](/brokers/) it published (`publishes`, each with `delivered` and an `error` when it
+was not):
 
 ```json
 {
