@@ -138,6 +138,18 @@ Finding kinds: `undeclaredOperation`, `uncoveredOperation`, `undeclaredStatus`, 
 same refusals as [import](/admin-api/#openapi-import) apply to the document — external `$ref`s are never
 fetched. See [the sandbox](/sandbox/#check-that-it-still-tells-the-truth).
 
+Two more checks answer the neighbouring questions:
+
+| Method | Path | Purpose | Response |
+|--------|------|---------|----------|
+| `POST` | `/__admin/recordings/verify` | Compare a live recording's captured responses against what the stubs would answer | `{recording, exchanges, agrees, findings:[…]}` |
+| `POST` | `/__admin/requests/verify` | Check journaled traffic against an OpenAPI document | `{conforms, requestsExamined, requestsConforming, findings:[…]}` |
+
+`recordings/verify` finding kinds: `noStub`, `statusDiffers`, `fieldMissing`, `fieldUnexpected`,
+`typeDiffers` — structural only, so differing ids and timestamps are never reported.
+`requests/verify` finding kinds: `undeclaredOperation`, `missingParameter`, `requestSchemaViolation`.
+Neither changes anything it looks at.
+
 ## Tenant clock
 
 What time this tenant's [templates](/templating/#controlling-the-clock) think it is. In memory and per

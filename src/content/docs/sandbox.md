@@ -133,6 +133,36 @@ counts, because "conforms" on an empty stub set is true and useless.
 Wiring it into CI is the point: fail the build when the mock and the contract disagree, before the
 disagreement reaches somebody's integration test.
 
+### Against reality, not just against the document
+
+A document can be stale too. With a [recording session](/record-and-playback/) live against the real
+upstream, the same question can be asked of reality:
+
+```bash
+curl -X POST http://localhost:8080/__admin/recordings/start -d '{"targetBaseUrl":"https://api.real.example.com"}'
+# …drive your integration tests through the mock as usual…
+curl -X POST http://localhost:8080/__admin/recordings/verify
+```
+
+It compares what the upstream just returned against what your stubs *would* have answered: a field the
+upstream grew, a field only the stub has, a changed type, a changed status, a call no stub matches.
+
+The comparison is **structural, never literal** — ids, timestamps and totals differ between
+environments and between minutes, and reporting them would bury the findings that matter. And it
+serves nothing while it looks: no journal entry, no scenario advances.
+
+### Is the client staying inside the contract?
+
+The same document, pointed at your traffic instead of your stubs:
+
+```bash
+curl -X POST http://localhost:8080/__admin/requests/verify --data-binary @openapi.yaml
+```
+
+Reports calls to operations the contract never declared, missing required query parameters and
+headers, and request bodies the schema forbids — all of which work perfectly against a mock that is
+more permissive than the real service, and fail the first time they meet it.
+
 :::note
 Three things are deliberately **not** reported, because a report with false findings is one nobody
 reads: a templated body (it is not JSON until a request renders it), a stub matching by regular
