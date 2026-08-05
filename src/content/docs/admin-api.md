@@ -98,6 +98,22 @@ verification only see retained entries, matching the reference engine's journal-
 | `POST` | `/__admin/requests/count` | Count requests matching a pattern | `{count:n}` |
 | `GET` | `/__admin/requests` | List logged requests | `{requests:[…]}` |
 | `DELETE` | `/__admin/requests` | Discard the tenant's journal — counts and the listing start empty | `200` |
+
+## Tenant clock
+
+What time this tenant's [templates](/templating/#controlling-the-clock) think it is. In memory and per
+tenant; the journal, audit trail and message inbox keep real time regardless.
+
+| Method | Path | Purpose | Response |
+|--------|------|---------|----------|
+| `GET` | `/__admin/clock` | Read the override | `{mode, frozenAt, offsetSeconds}` — `mode` is `real`, `frozen` or `offset` |
+| `PUT` | `/__admin/clock` | `{"frozenAt": "<ISO-8601>"}` **or** `{"offsetSeconds": <signed>}` | the stored override |
+| `DELETE` | `/__admin/clock` | Return the tenant to real time | `200` |
+
+| Error code | HTTP | When |
+|------------|------|------|
+| `Clock.Ambiguous` | 422 | Both `frozenAt` and `offsetSeconds` were given |
+| `Clock.InvalidBody` | 422 | The body is not JSON, or the instant does not parse |
 | `GET` | `/__admin/requests/{id}` | Full detail for one request | see below |
 
 The body of `POST /__admin/requests/count` is a **request pattern** built from the same matchers as a

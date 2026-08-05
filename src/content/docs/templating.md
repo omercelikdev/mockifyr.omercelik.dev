@@ -63,6 +63,45 @@ Helper arguments use **single quotes** — `'$.field'`. Mockifyr serialises a te
 verbatim, the same way the reference engine does, so single-quoted arguments resolve correctly.
 :::
 
+## Controlling the clock
+
+`{{now}}` reads the host clock, which makes anything date-dependent testable only in real time — a
+token that expires in an hour, a statement that closes at month end, a trial that ends in fourteen
+days. A tenant can be moved instead:
+
+```bash
+# Stand still at an instant
+curl -X PUT http://localhost:8080/__admin/clock \
+  -H 'Content-Type: application/json' \
+  -d '{"frozenAt":"2027-01-01T00:00:00Z"}'
+
+# Or keep running, shifted (negative works too)
+curl -X PUT http://localhost:8080/__admin/clock -d '{"offsetSeconds":86400}'
+
+# Back to the host clock
+curl -X DELETE http://localhost:8080/__admin/clock
+```
+
+Frozen means frozen: two requests a second apart render the same instant, which is what makes a
+templated date assertable instead of approximately right.
+
+The clock applies to everything a response says about time — `{{now}}`, the [date
+helpers](/template-helpers/), a minted `{{jwt}}`'s `iat`/`exp`, and [webhook](/webhooks/) templates —
+so a response and the callback it triggers agree with each other.
+
+It is **per tenant**, so parallel suites can each live in their own year, and **in memory**: a restart
+returns every tenant to real time rather than leaving a host mysteriously convinced it is 2027.
+
+:::note
+The [request journal](/verifying-requests/), the audit trail and the message inbox keep **real** time.
+They record when something actually happened, and a forensic record that follows a test's fiction is
+worth nothing.
+:::
+
+The two modes are exclusive — a body carrying both `frozenAt` and `offsetSeconds` is refused with
+`Clock.Ambiguous` rather than resolved in favour of one. To step a frozen clock forward, freeze it at
+the new instant.
+
 ## Related
 
 - [Template helper reference](/template-helpers/) — every helper, and the ones that do not exist
