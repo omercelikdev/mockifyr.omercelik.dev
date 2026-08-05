@@ -102,12 +102,15 @@ See [record and playback](/record-and-playback/).
 
 ## Unmatched requests
 
-When nothing matches, only the **404 status** is served. The reference engine's verbose near-miss diagnostic body is
-not reproduced.
+When nothing matches, only the **404 status** is served. The reference engine's verbose near-miss
+diagnostic body is not reproduced — deliberately, so the response a client receives is exactly what it
+would be without diagnostics.
 
 :::tip
-To diagnose a request that didn't match, use `GET /__admin/requests?unmatched=true` or the
-[dashboard](/the-dashboard/) journal instead of reading the 404 body.
+The diagnosis is a [near-miss query](/verifying-requests/#let-mockifyr-do-the-comparison) instead:
+`GET /__admin/requests/{id}/near-misses` names the attribute that disagreed and what the request
+carried there. `GET /__admin/requests?unmatched=true` and the [dashboard](/the-dashboard/) journal show
+the raw exchange.
 :::
 
 ## Persistence
