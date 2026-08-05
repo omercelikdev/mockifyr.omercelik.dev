@@ -62,6 +62,36 @@ header the client adds that your `equalTo` did not expect, a JSON body with diff
 The [dashboard](/the-dashboard/)'s **Journal** screen is the same data with the comparison already
 laid out, which is generally faster than curl for this particular question.
 
+### Let Mockifyr do the comparison
+
+Rather than eyeballing the two side by side, ask which stubs came closest and where each one parted
+company with the request:
+
+```bash
+curl http://localhost:8080/__admin/requests/{id}/near-misses
+```
+
+```json
+{ "wasMatched": false,
+  "nearMisses": [
+    { "stubId": "…", "distance": 1,
+      "expected": { "method": "POST", "urlPath": "/api/orders", "headers": {"X-Api-Key": {"equalTo": "secret"}} },
+      "attributes": [
+        { "attribute": "urlPath", "matched": true,  "actual": "/api/orders" },
+        { "attribute": "method",  "matched": true,  "actual": "POST" },
+        { "attribute": "headers['X-Api-Key']", "matched": false, "actual": "wrong" } ] } ] }
+```
+
+Each attribute is named the way **your stub** is written — `urlPath`, `headers['X-Api-Key']`,
+`bodyPatterns[0]` — so you can search your own mapping for the string in the report.
+
+Debugging a stub before the client is wired up works too, with a request you have not sent:
+
+```bash
+curl -X POST http://localhost:8080/__admin/near-misses/request \
+  -d '{"method":"POST","url":"/api/orders","headers":{"X-Api-Key":"nope"}}'
+```
+
 :::note
 Mockifyr serves a plain **404** for an unmatched request — it does not write a diagnostic body
 explaining the closest stub. The journal is where that question gets answered instead. This is a

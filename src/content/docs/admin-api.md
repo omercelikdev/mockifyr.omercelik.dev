@@ -99,6 +99,45 @@ verification only see retained entries, matching the reference engine's journal-
 | `GET` | `/__admin/requests` | List logged requests | `{requests:[…]}` |
 | `DELETE` | `/__admin/requests` | Discard the tenant's journal — counts and the listing start empty | `200` |
 
+## Near-miss diagnostics
+
+Why a request matched nothing, per attribute. See [verifying requests](/verifying-requests/#let-mockifyr-do-the-comparison).
+
+| Method | Path | Purpose | Response |
+|--------|------|---------|----------|
+| `GET` | `/__admin/requests/{id}/near-misses` | Explain a journaled request | `{wasMatched, nearMisses:[…]}` |
+| `POST` | `/__admin/near-misses/request` | Explain a request you have not sent — `{method, url, headers?, body?}` | `{nearMisses:[…]}` |
+
+Each near miss carries the stub's id, its `distance`, the stub's own request block as `expected`, and
+per-attribute verdicts naming the mapping JSON's own slots (`urlPath`, `headers['X-Api-Key']`,
+`bodyPatterns[0]`) with what the request actually carried there. The served **404 is unchanged** — the
+diagnostic lives here, never in the response body.
+
+## Degradation profile
+
+What a whole dependency is doing to this tenant. See [delays and faults](/delays-and-faults/#degrading-a-whole-dependency).
+
+| Method | Path | Purpose | Response |
+|--------|------|---------|----------|
+| `GET` | `/__admin/degradation` | Read the profile | `{degraded, latency, errorRate, faultRate, seed}` |
+| `PUT` | `/__admin/degradation` | `{latency?, errorRate?, faultRate?, seed?}` | the stored profile, seed included |
+| `DELETE` | `/__admin/degradation` | Return the tenant to full health | `200` |
+
+| Error code | HTTP | When |
+|------------|------|------|
+| `Degradation.OutOfRange` | 422 | A ratio outside 0–1, a negative delay, a status outside 100–599, or an unknown fault name |
+| `Degradation.InvalidBody` | 422 | The body is not JSON |
+
+## Contract conformance
+
+| Method | Path | Purpose | Response |
+|--------|------|---------|----------|
+| `POST` | `/__admin/openapi/verify` | Check this tenant's stubs against an OpenAPI 3.x document | `{conforms, operationsInSpec, operationsCovered, findings:[…]}` |
+
+Finding kinds: `undeclaredOperation`, `uncoveredOperation`, `undeclaredStatus`, `schemaViolation`. The
+same refusals as [import](/admin-api/#openapi-import) apply to the document — external `$ref`s are never
+fetched. See [the sandbox](/sandbox/#check-that-it-still-tells-the-truth).
+
 ## Tenant clock
 
 What time this tenant's [templates](/templating/#controlling-the-clock) think it is. In memory and per

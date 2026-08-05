@@ -103,6 +103,43 @@ levels (a cyclic `$ref`) is refused instead of hanging.
 
 The dashboard's **Add stub → OpenAPI** channel does the same thing with a file picker.
 
+## Check that it still tells the truth
+
+A mock that has quietly drifted from the API it models is worse than no mock, because it manufactures
+confidence: the upstream adds a required field, the stubs do not follow, the tests stay green, and
+production breaks.
+
+The same document you imported from can be used to check the stubs you have now:
+
+```bash
+curl -X POST http://localhost:8080/__admin/openapi/verify --data-binary @openapi.yaml
+```
+
+```json
+{ "conforms": false, "operationsInSpec": 12, "operationsCovered": 9,
+  "findings": [
+    { "kind": "schemaViolation", "method": "GET", "path": "/orders/{id}", "stubId": "…",
+      "detail": "/total: Required properties [\"total\"] were not present" },
+    { "kind": "undeclaredOperation", "method": "GET", "path": "/legacy/orders", "stubId": "…",
+      "detail": "The specification declares no such operation…" } ] }
+```
+
+Four kinds of finding — a stub answering an operation the spec no longer declares, an operation no
+stub answers, an undeclared status, and a body that violates the declared schema — plus coverage
+counts, because "conforms" on an empty stub set is true and useless.
+
+**It reports; it never changes anything.** Which side is wrong is a judgement about your system.
+
+Wiring it into CI is the point: fail the build when the mock and the contract disagree, before the
+disagreement reaches somebody's integration test.
+
+:::note
+Three things are deliberately **not** reported, because a report with false findings is one nobody
+reads: a templated body (it is not JSON until a request renders it), a stub matching by regular
+expression (a spec path cannot be compared to one without guessing), and an operation whose schema the
+document omits.
+:::
+
 ## Hand it to a partner
 
 Start the host with `--sandbox-auth` and issue a key per consumer:
