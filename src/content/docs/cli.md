@@ -49,6 +49,9 @@ See [HTTPS, HTTP/2 and mTLS](/https-and-mtls/).
 | `--smtp-port <n>` | unset | Starts the ESMTP capture listener: real mail in, realistic replies out, everything captured into the tenant inbox. The AUTH username selects the tenant. See [Email & SMS mocking](/messages/). |
 | `--sms-profile twilio` | unset | Mounts Twilio's send-message endpoint on the mock surface — the official SDK works unchanged; every send is captured. A stub on the same URL still wins. |
 | `--message-limit <n>` | `1000` | Per-tenant inbox bound; the oldest message is evicted first. |
+| `--kafka-bootstrap <servers>` | unset | Connects the [broker channel](/brokers/): stubs can publish, and capture becomes available. Without it nothing connects. |
+| `--kafka-subscribe <topics>` | unset | Comma-separated topics to capture into the message inbox. Publishing works without this; capture needs it. |
+| `--kafka-group <id>` | `mockifyr` | Consumer group for capture, so replicas share a subscription rather than each receiving everything. |
 
 ### Security hardening
 

@@ -89,6 +89,7 @@ export default defineConfig({
           label: 'Messages',
           items: [
             { label: 'Email & SMS mocking', slug: 'messages' },
+            { label: 'Message brokers', slug: 'brokers' },
           ],
         },
         {
