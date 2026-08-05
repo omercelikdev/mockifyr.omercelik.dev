@@ -54,11 +54,30 @@ order.
 The response still goes out. The failure is recorded on the [journal](/verifying-requests/) entry:
 
 ```json
-"publishes": [{ "topic": "payments.events", "delivered": false, "error": "Local: Message timed out" }]
+"publishes": [{
+  "topic": "payments.events", "key": "ord-7", "body": "{\"type\":\"PaymentAccepted\"}",
+  "delivered": false, "error": "Local: Message timed out"
+}]
 ```
 
-A successful delivery is recorded the same way, with `delivered: true` and the message that went out —
-a stub that claims to emit an event and quietly fails to would be worse than one that never claimed it.
+A failure records **what it was carrying**, not just that it failed — otherwise a template mistake and
+an unreachable broker look identical afterwards. A `null` key and body mean rendering itself failed, so
+there was never a message; the error says which template.
+
+A successful delivery is recorded the same way, with `delivered: true` — a stub that claims to emit an
+event and quietly fails to would be worse than one that never claimed it.
+
+### Without `--kafka-bootstrap`
+
+A `publish` action is still accepted, and the stub still serves its response — but nothing is emitted,
+because there is no producer to emit it. That is easy to mistake for a broker outage, so it is reported
+when the stub is created and again at startup for mappings loaded from disk:
+
+```json
+{ "id": "…", "warnings": ["a 'publish' post-serve action was accepted but this host has no broker — …"] }
+```
+
+The stub is not rejected: the goal is to be loud, not strict.
 
 ## Assert on what your system published
 
