@@ -262,8 +262,8 @@ mappings stay portable.
 
 - **Schema registries** (Avro, Protobuf). Bodies are text.
 - **Transactions and exactly-once.** The guarantee is at-least-once, stated.
-- **A dashboard screen.** Broker mappings are API-only; captured messages do show on the Messages
-  screen.
+- **A dashboard screen for broker mappings.** They are API-only. Captured broker messages *do* appear
+  on the Messages screen, with their own filter.
 
 ## Related
 
