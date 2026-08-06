@@ -436,7 +436,7 @@ honour `X-Mockifyr-Tenant`.
 
 | Route | Effect |
 |-------|--------|
-| `GET /__admin/messages` | List, newest first. Filters: `channel=email\|sms`, `recipient` (case-insensitive substring over any addressee), `contains` (subject + bodies), `matches` (regex, 250 ms budget — malformed patterns filter to nothing), `limit` (0 = unlimited). |
+| `GET /__admin/messages` | List, newest first. Filters: `channel=email\|sms\|broker`, `recipient` (case-insensitive substring over any addressee), `contains` (subject + bodies), `matches` (regex, 250 ms budget — malformed patterns filter to nothing), `limit` (0 = unlimited). |
 | `GET /__admin/messages/count` | Count under the same filters — always agrees with the list. |
 | `GET /__admin/messages/{id}` | One message, including `raw` — the wire payload byte-for-byte (full MIME for mail, the provider form body for SMS). |
 | `GET /__admin/messages/{id}/attachments/{index}` | Attachment bytes with the stored content type and file name. |
@@ -445,6 +445,18 @@ honour `X-Mockifyr-Tenant`.
 | `DELETE /__admin/messages/{id}` | Delete one message (`404` when it is not in this tenant's inbox). |
 | `POST /__admin/messages/reset` | Clear the tenant's inbox. |
 | `GET/PUT/DELETE /__admin/messages/behaviors` | Per-tenant channel directives: `{"smtpFault":"none\|reject\|drop","smtpDelayMs":0,"smsErrorCode":21211,"webhookUrl":"…"}`. `PUT` validates (negative delay or a non-five-digit code → `422`); `DELETE` resets to defaults. |
+
+### Broker mappings
+
+Serve on consume ([Message brokers](/brokers/)). Registered **only** when the host was started with
+`--kafka-bootstrap` — a mapping that could never be evaluated has nowhere to be posted.
+
+| Route | Effect |
+|-------|--------|
+| `POST /__admin/broker-mappings` | Register a mapping: `whenTopic` / `whenHeaders` / `whenMessage` (all optional, all standard matchers) plus `publish[]`. `422` on malformed JSON. |
+| `GET /__admin/broker-mappings` | List the tenant's mappings, each with the registration JSON verbatim. |
+| `DELETE /__admin/broker-mappings/{id}` | Remove one (`404` when it is not this tenant's). |
+| `POST /__admin/broker-mappings/reset` | Remove every mapping this tenant owns. |
 
 ### gRPC descriptors
 

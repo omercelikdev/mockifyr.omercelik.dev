@@ -129,12 +129,88 @@ The inbox is bounded and in memory, like every other channel — see [`--message
 place to assert on recent traffic, not a durable log.
 :::
 
+## Reply to a message with a message
+
+Publishing from an HTTP stub covers "my API emits an event". The other half — "my *component* consumes
+a command and emits an event" — is a **broker mapping**: a trigger over an inbound message and the
+messages it sends in reply.
+
+```bash
+curl -X POST http://localhost:8080/__admin/broker-mappings -d '{
+  "whenTopic":   { "equalTo": "orders.commands" },
+  "whenMessage": [{ "matchesJsonPath": { "expression": "$.type", "equalTo": "SettleOrder" } }],
+  "publish": [{
+    "topic": "orders.events",
+    "key":   "{{jsonPath message.body \'$.orderId\'}}",
+    "body":  "{\"type\":\"OrderSettled\",\"orderId\":\"{{jsonPath message.body \'$.orderId\'}}\"}"
+  }]
+}'
+```
+
+Produce a `SettleOrder` on `orders.commands`, and your own consumer receives `OrderSettled` on
+`orders.events`. Mockifyr is standing in for the component in between.
+
+Mappings are listed, deleted and reset the same way:
+
+```bash
+curl http://localhost:8080/__admin/broker-mappings
+curl -X DELETE http://localhost:8080/__admin/broker-mappings/<id>
+curl -X POST http://localhost:8080/__admin/broker-mappings/reset
+```
+
+:::note
+These routes exist only when the host was started with `--kafka-bootstrap`. A mapping you could post
+but that would never be evaluated is a trap, so there is nothing to post to.
+:::
+
+### Matching
+
+Three optional parts, and **all** of them must match:
+
+| Field | Matches on | Matchers |
+|---|---|---|
+| `whenTopic` | the topic it arrived on | any [value matcher](/matching/) — `equalTo`, `matches`, `contains`, … |
+| `whenHeaders` | message headers, by name | any value matcher, per header |
+| `whenMessage` | the payload | any [body matcher](/matching/) — `equalToJson`, `matchesJsonPath`, `equalToXml`, … |
+
+These are the **same matchers as everywhere else** — nothing was invented for this channel, so
+`equalToJson`'s array handling and `matchesJsonPath`'s expressions behave exactly as they do on an HTTP
+stub. A mapping with no trigger at all matches every message on the subscribed topics.
+
+### What a reply can say
+
+Every field of a `publish` is templated, against the inbound message:
+
+| | |
+|---|---|
+| `{{message.body}}` | the payload — use with `jsonPath`, `xPath` and the rest |
+| `{{message.topic}}` | where it arrived |
+| `{{message.key}}` | its partition key, empty when the producer set none |
+| `{{message.headers.<name>}}` | one header by name |
+
+The destination `topic` is templated too, so one mapping can route by content instead of one mapping
+per destination. Your tenant's [environment keys](/environments/) and [clock](/admin-api/) resolve here
+exactly as they do in an HTTP response.
+
+### Rules worth knowing
+
+- **Every matching mapping fires**, not just the first. A fan-out — one command producing an event
+  *and* an audit record from separate mappings — is a real pattern, and a broker can carry any number
+  of replies where HTTP can send one response.
+- **The inbound message is still captured.** Serving does not consume it; it is in the inbox
+  afterwards, which is how you debug a mapping that did not fire.
+- **An unmatched message is acknowledged, not parked.** A forgotten mapping must not stall a partition.
+- **A broken template drops its own message and no other**, so a typo in an audit mapping cannot stop
+  the event your system is waiting for.
+- **Offsets commit after the reply is dispatched**, so a host that died mid-reply redelivers rather
+  than losing it.
+
 ## What is not here yet
 
-- **Serving on consume** — an inbound message matching a stub and producing outbound ones. Publishing
-  is triggered by an HTTP request today.
 - **AMQP / RabbitMQ.** Kafka is the transport that exists.
 - **Schema registries** (Avro, Protobuf). Bodies are text.
+- **A dashboard screen.** Broker mappings are API-only for now; captured messages do show on the
+  Messages screen.
 
 ## Related
 
