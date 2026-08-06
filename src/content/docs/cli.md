@@ -52,6 +52,8 @@ See [HTTPS, HTTP/2 and mTLS](/https-and-mtls/).
 | `--kafka-bootstrap <servers>` | unset | Connects the [broker channel](/brokers/): stubs can publish, and capture becomes available. Without it nothing connects. |
 | `--kafka-subscribe <topics>` | unset | Comma-separated topics to capture into the message inbox. Publishing works without this; capture needs it. |
 | `--kafka-group <id>` | `mockifyr` | Consumer group for capture, so replicas share a subscription rather than each receiving everything. |
+| `--amqp-uri <uri>` | — | Connect to AMQP / RabbitMQ (e.g. `amqp://guest:guest@localhost:5672/`). Same channel, second transport — see [Message brokers](/brokers/). |
+| `--amqp-subscribe <queues>` | — | Comma-separated queues to consume. Declared on connect, so a queue nobody has created yet is fine. |
 
 ### Security hardening
 
