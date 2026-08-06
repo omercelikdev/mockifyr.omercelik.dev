@@ -14,13 +14,19 @@ Mockifyr's broker channel covers both directions:
 | **Publish** | A stub answers a request **and** emits the event the rest of the system is waiting for |
 | **Capture** | Messages your system publishes land in the message inbox, so you can assert on them |
 
-Both are opt-in. A host started without `--kafka-bootstrap` builds no producer, joins no consumer
-group, and attempts no connection.
+Both are opt-in, and both work over **Kafka** or **AMQP / RabbitMQ**. A host started without a broker
+flag builds no producer, joins no consumer group, and attempts no connection.
 
 ```bash
 mockifyr --kafka-bootstrap localhost:9092 \
          --kafka-subscribe orders.events,payments.events
+
+mockifyr --amqp-uri amqp://guest:guest@localhost:5672/ \
+         --amqp-subscribe orders.events
 ```
+
+Everything below is written with Kafka's vocabulary and applies to both. The two places AMQP differs
+are spelled out under [AMQP](#amqp).
 
 ## Emit an event when a stub matches
 
@@ -205,12 +211,59 @@ exactly as they do in an HTTP response.
 - **Offsets commit after the reply is dispatched**, so a host that died mid-reply redelivers rather
   than losing it.
 
+## AMQP
+
+AMQP is the same channel over a different transport: the same `publish` actions, the same broker
+mappings, the same inbox, the same admin routes. Two things need translating, because AMQP does not
+have the concepts the mapping vocabulary was written against.
+
+### A topic is an exchange and a routing key
+
+| `topic` | Where it goes |
+|---|---|
+| `orders.events` | the **default exchange**, routing key `orders.events` — which delivers straight to a queue of that name |
+| `amq.topic/order.settled` | exchange `amq.topic`, routing key `order.settled` |
+| `logs/` | exchange `logs`, empty routing key — what a fanout exchange wants |
+
+Only the first slash splits, so a routing key may contain more.
+
+That first row is the point: `{"topic":"orders.events"}` means the obvious thing on **both**
+transports, so a mapping written for one host runs on the other.
+
+### A partition key becomes `MessageId`
+
+AMQP has no partition key. Rather than drop it, `key` is set as the message's `MessageId` — the
+closest standard property, and one your consumer can read.
+
+On the way **in**, the **queue** stands in for the topic, so `whenTopic` works unchanged:
+
+```bash
+mockifyr --amqp-uri amqp://guest:guest@localhost:5672/ --amqp-subscribe orders.commands
+```
+
+Queues you subscribe to are declared on connect, so pointing Mockifyr at a queue nobody has created
+yet works. Messages are acknowledged one at a time, **after** capture and serving — a host that died
+in between redelivers rather than losing the message.
+
+### Running both
+
+A host can configure Kafka and AMQP at once. A topic then names which one it means:
+
+```json
+{"publish":[{"topic":"kafka:orders.events","body":"…"},
+            {"topic":"amqp:audit","body":"…"}]}
+```
+
+An unprefixed topic goes to Kafka. On a host with only one broker the prefix is unnecessary and
+harmless — a prefix naming a transport that is not configured falls back rather than failing, so
+mappings stay portable.
+
 ## What is not here yet
 
-- **AMQP / RabbitMQ.** Kafka is the transport that exists.
 - **Schema registries** (Avro, Protobuf). Bodies are text.
-- **A dashboard screen.** Broker mappings are API-only for now; captured messages do show on the
-  Messages screen.
+- **Transactions and exactly-once.** The guarantee is at-least-once, stated.
+- **A dashboard screen.** Broker mappings are API-only; captured messages do show on the Messages
+  screen.
 
 ## Related
 
